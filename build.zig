@@ -47,7 +47,6 @@ pub fn build(b: *std.Build) void {
         .link_libcpp = true,
     });
     modfltk.addCMacro("FL_LIBRARY", "");
-
     modfltk.addCSourceFiles(.{
         .files = &.{
             "src/Fl.cxx",
