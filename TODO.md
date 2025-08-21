@@ -46,4 +46,26 @@ targets that can be built:
 The scary configure pattern. These need to be quashed and replaced with the zig
 build system:
 
-* TODO
+* CMake/FLTKConfig.cmake.in
+* CMake/MacOSXBundleInfo.plist.in
+* CMake/cmake_uninstall.cmake.in
+* CMake/install-symlinks.cmake.in
+* CMake/macOS-bundle-wrapper.in
+* config.h.in
+* documentation/Doxyfile.in
+* documentation/copyright.dox.in
+* documentation/generated.dox.in
+* documentation/make_pdf.in
+* documentation/src/fltk-title.tex.in
+* documentation/version.dox.in
+* fl_config.h.in
+* fltk-config.in
+* fluid/documentation/Doxyfile.in
+* fluid/documentation/copyright.dox.in
+* fluid/documentation/generated.dox.in
+* fluid/documentation/make_pdf.in
+* fluid/documentation/src/fluid-title.tex.in
+* fluid/documentation/version.dox.in
+
+Most of these do not seem to be related to the main fltk library itself. It may
+still be nice to port...
