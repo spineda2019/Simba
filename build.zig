@@ -22,16 +22,13 @@ const CXXStandard = enum {
 // declaratively construct a build graph that will be executed by an external
 // runner.
 pub fn build(b: *std.Build) void {
-    // Standard target options allows the person running `zig build` to choose
-    // what target to build for. Here we do not override the defaults, which
-    // means any target is allowed, and the default is native. Other options
-    // for restricting supported target set are available.
     const target = b.standardTargetOptions(.{});
 
-    // Standard optimization options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
-    // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
+
+    // ****************************** Options ****************************** //
+    // The following options are largely lifted from FLTK's original CMake
+    // strcuture.
 
     const cxx_std: CXXStandard = b.option(
         CXXStandard,
@@ -39,7 +36,70 @@ pub fn build(b: *std.Build) void {
         "C++ Version To Use",
     ) orelse .cpp11;
 
+    const prefix_data: ?[]const u8 = b.option(
+        []const u8,
+        "PREFIX_DATA",
+        "Location for read-only arch-independent data for FLTK",
+    );
+    const prefix_data_as_string: std.ArrayList(u8) = .init(b.allocator);
+    try prefix_data_as_string.append('\"') catch @panic("OOM");
+    if (prefix_data) |payload| {
+        try prefix_data_as_string.appendSlice(payload) catch @panic("OOM");
+    } else {
+        try prefix_data_as_string.appendSlice(b.install_prefix) catch @panic("OOM");
+        try prefix_data_as_string.appendSlice("fltkdatadir/") catch @panic("OOM");
+    }
+    try prefix_data_as_string.append('\"') catch @panic("OOM");
+
+    const prefix_doc: ?[]const u8 = b.option(
+        []const u8,
+        "PREFIX_DOC",
+        "Location for read-only arch-independent data for FLTK",
+    );
+    const prefix_doc_as_string: std.ArrayList(u8) = .init(b.allocator);
+    try prefix_doc_as_string.append('\"') catch @panic("OOM");
+    if (prefix_doc) |payload| {
+        try prefix_doc_as_string.appendSlice(payload) catch @panic("OOM");
+    } else {
+        try prefix_doc_as_string.appendSlice(b.install_prefix) catch @panic("OOM");
+        try prefix_doc_as_string.appendSlice("fltkdatadir/") catch @panic("OOM");
+        try prefix_doc_as_string.appendSlice("doc/") catch @panic("OOM");
+    }
+    try prefix_doc_as_string.append('\"') catch @panic("OOM");
+
+    const fltk_custom_optimization_flags: []const [:0]const u8 = b.option(
+        []const [:0]const u8,
+        "FLTK_OPTION_OPTIM",
+        "Custom FLTK Optimization flags",
+    ) orelse &.{};
+    _ = fltk_custom_optimization_flags; // FIXME: not a real string list yet
+
+    const link_libgl: bool = b.option(
+        bool,
+        "linkgl",
+        "whether or not to link LIBGL",
+    ) orelse false;
+
+    const link_libmesagl: bool = b.option(
+        bool,
+        "linkmesagl",
+        "whether or not to link LIBGL",
+    ) orelse false;
+
+    const have_gl: bool = link_libgl or link_libmesagl;
+
+    if (link_libgl and link_libmesagl) {
+        @panic("-Dlinkgl and -Dlinkmesagl cannot both be set to true.");
+    }
+    // ****************************** Targets ****************************** //
+
+    // TODO:
+    // build cairo dummy library. Doesn't seem needed right now, don't know why
+    // it still exists in the FLTK repo. Should be done is FLTK_HAVE_CAIRO is
+    // set to true.
+
     const fltk = b.dependency("fltk", .{});
+
     const modfltk = b.createModule(.{
         .target = target,
         .optimize = optimize,
@@ -47,7 +107,20 @@ pub fn build(b: *std.Build) void {
         .link_libcpp = true,
     });
     modfltk.addCMacro("FL_LIBRARY", "");
+    modfltk.addCMacro("FLTK_DATADIR", prefix_data_as_string.items);
+    modfltk.addCMacro("FLTK_DOCDIR", prefix_doc_as_string.items);
+    if (have_gl) {
+        modfltk.addCMacro("HAVE_GL", "1");
+    } else {
+        modfltk.addCMacro("HAVE_GL", "0");
+    }
+    if (link_libgl) {
+        modfltk.linkSystemLibrary("GL", .{});
+    } else if (link_libmesagl) {
+        modfltk.linkSystemLibrary("MesaGL", .{});
+    }
     modfltk.addCSourceFiles(.{
+        // TODO: Check if FLT_HAVE_CAIRO, then add Fl_Cairo.cxx if so
         .files = &.{
             "src/Fl.cxx",
             "src/Fl_Adjuster.cxx",
@@ -210,7 +283,8 @@ pub fn build(b: *std.Build) void {
         .language = .cpp,
         .root = fltk.path(""),
     });
-    modfltk.addIncludePath(fltk.path("FL"));
+    modfltk.addIncludePath(fltk.path(""));
+    modfltk.addIncludePath(b.path("fl_gen/"));
 
     const libfltk = b.addLibrary(.{
         .linkage = .static,
@@ -272,5 +346,3 @@ pub fn build(b: *std.Build) void {
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
 }
-
-// fn flCreateModule(b: *std.Build, comptime name: []const u8) void {}
