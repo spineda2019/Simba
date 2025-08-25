@@ -76,7 +76,8 @@
  * (many broken Mesa RPMs do not...)
  */
 
-#cmakedefine01 HAVE_GL_GLU_H
+// Now defined in build.zig
+// #cmakedefine01 HAVE_GL_GLU_H
 
 /*
  * HAVE_GLXGETPROCADDRESSARB:

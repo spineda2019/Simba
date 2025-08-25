@@ -18,6 +18,12 @@ const CXXStandard = enum {
     }
 };
 
+const Backend = enum {
+    X11,
+    Wayland,
+    Apple,
+};
+
 // Although this function looks imperative, note that its job is to
 // declaratively construct a build graph that will be executed by an external
 // runner.
@@ -91,6 +97,19 @@ pub fn build(b: *std.Build) void {
     if (link_libgl and link_libmesagl) {
         @panic("-Dlinkgl and -Dlinkmesagl cannot both be set to true.");
     }
+
+    const backend: ?Backend = b.option(
+        Backend,
+        "BACKEND",
+        "Which backend to use. E.g. Wayland.",
+    );
+    _ = backend;
+
+    const have_gl_glu_header: bool = b.option(
+        bool,
+        "HAVE_GL_GLU_H",
+        "Whether or not you have the GL/glu header. Classicly in CMake this could be detected, but we just have to trust you on it in zig build. Defaults to false.",
+    ) orelse false;
     // ****************************** Targets ****************************** //
 
     // TODO:
@@ -111,8 +130,14 @@ pub fn build(b: *std.Build) void {
     modfltk.addCMacro("FLTK_DOCDIR", prefix_doc_as_string.items);
     if (have_gl) {
         modfltk.addCMacro("HAVE_GL", "1");
+        // TODO: make function to actually search include dirs
+        modfltk.addCMacro("HAVE_GL_GLU_H", switch (have_gl_glu_header) {
+            true => "1",
+            false => "0",
+        });
     } else {
         modfltk.addCMacro("HAVE_GL", "0");
+        modfltk.addCMacro("HAVE_GL_GLU_H", "0");
     }
     if (link_libgl) {
         modfltk.linkSystemLibrary("GL", .{});
