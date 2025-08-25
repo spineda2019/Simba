@@ -18,12 +18,6 @@ const CXXStandard = enum {
     }
 };
 
-const Backend = enum {
-    X11,
-    Wayland,
-    Apple,
-};
-
 // Although this function looks imperative, note that its job is to
 // declaratively construct a build graph that will be executed by an external
 // runner.
@@ -98,12 +92,29 @@ pub fn build(b: *std.Build) void {
         @panic("-Dlinkgl and -Dlinkmesagl cannot both be set to true.");
     }
 
-    const backend: ?Backend = b.option(
-        Backend,
-        "BACKEND",
-        "Which backend to use. E.g. Wayland.",
-    );
-    _ = backend;
+    const wayland_backend: bool = b.option(
+        bool,
+        "WAYLAND",
+        "Use the wayland backend. Defaults to true on linux/unix.",
+    ) orelse switch (target.result.os.tag) {
+        .linux, .freebsd => true,
+        else => false,
+    };
+    if (wayland_backend and target.result.os.tag != .linux) {
+        @panic("-DWAYLAND is only valid on linux/unix");
+    }
+
+    const x11_backend: bool = b.option(
+        bool,
+        "X11",
+        "Use the X11 backend. Defaults to true on linux/unix.",
+    ) orelse switch (target.result.os.tag) {
+        .linux, .freebsd => true,
+        else => false,
+    };
+    if (x11_backend and target.result.os.tag != .linux) {
+        @panic("-DWAYLAND is only valid on linux/unix");
+    }
 
     const have_gl_glu_header: bool = b.option(
         bool,
@@ -135,6 +146,9 @@ pub fn build(b: *std.Build) void {
             true => "1",
             false => "0",
         });
+        if (x11_backend) {
+            modfltk.addCMacro("HAVE_GLXGETPROCADDRESSARB", "1");
+        }
     } else {
         modfltk.addCMacro("HAVE_GL", "0");
         modfltk.addCMacro("HAVE_GL_GLU_H", "0");
@@ -144,6 +158,10 @@ pub fn build(b: *std.Build) void {
     } else if (link_libmesagl) {
         modfltk.linkSystemLibrary("MesaGL", .{});
     }
+    modfltk.addCMacro("HAVE_XINERAMA", switch (x11_backend) {
+        true => "1",
+        false => "0",
+    });
     modfltk.addCSourceFiles(.{
         // TODO: Check if FLT_HAVE_CAIRO, then add Fl_Cairo.cxx if so
         .files = &.{
@@ -318,7 +336,6 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(libfltk);
 
-    // We will also create a module for our other entry point, 'main.zig'.
     const modsimba = b.createModule(.{
         .target = target,
         .optimize = optimize,
@@ -336,38 +353,21 @@ pub fn build(b: *std.Build) void {
         .language = .cpp,
     });
 
-    // This creates another `std.Build.Step.Compile`, but this one builds an executable
-    // rather than a static library.
     const simba = b.addExecutable(.{
         .name = "simba",
         .root_module = modsimba,
     });
 
-    // This declares intent for the executable to be installed into the
-    // standard location when the user invokes the "install" step (the default
-    // step when running `zig build`).
     b.installArtifact(simba);
 
-    // This *creates* a Run step in the build graph, to be executed when another
-    // step is evaluated that depends on it. The next line below will establish
-    // such a dependency.
     const run_cmd = b.addRunArtifact(simba);
 
-    // By making the run step depend on the install step, it will be run from the
-    // installation directory rather than directly from within the cache directory.
-    // This is not necessary, however, if the application depends on other installed
-    // files, this ensures they will be present and in the expected location.
     run_cmd.step.dependOn(b.getInstallStep());
 
-    // This allows the user to pass arguments to the application in the build
-    // command itself, like this: `zig build run -- arg1 arg2 etc`
     if (b.args) |args| {
         run_cmd.addArgs(args);
     }
 
-    // This creates a build step. It will be visible in the `zig build --help` menu,
-    // and can be selected like this: `zig build run`
-    // This will evaluate the `run` step rather than the default, which is "install".
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
 }

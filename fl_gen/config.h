@@ -85,7 +85,8 @@
  * Do you have the OpenGL glXGetProcAddressARB() function?
  */
 
-#cmakedefine HAVE_GLXGETPROCADDRESSARB 1
+// no defined in build.zig
+// #cmakedefine HAVE_GLXGETPROCADDRESSARB 1
 
 /*
  * USE_COLORMAP:
@@ -102,7 +103,8 @@
  * Do we have the Xinerama library to support multi-head displays?
  */
 
-#cmakedefine01 HAVE_XINERAMA
+// defined in build.zig
+// #cmakedefine01 HAVE_XINERAMA
 
 /*
  * USE_XFT
