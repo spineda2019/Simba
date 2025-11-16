@@ -36,6 +36,8 @@ fn main() {
     );
     println!("cargo:rustc-env=CC={}", cc_path);
     println!("cargo:rustc-env=CXX={}", cxx_path);
+    println!("cargo:rustc-env=CMAKE_C_COMPILER={}", cc_path);
+    println!("cargo:rustc-env=CMAKE_CXX_COMPILER={}", cxx_path);
     println!("cargo:rustc-env=AR={}", ar_path);
     println!(
         "cargo:rustc-env=CARGO_TARGET_{}_OBJCOPY={}",
@@ -45,9 +47,4 @@ fn main() {
         "cargo:rustc-env=CARGO_TARGET_{}_WINDRES={}",
         target_var_name, rc_path
     );
-    let cmake_flags = format!(
-        "-DCMAKE_C_COMPILER={};-DCMAKE_CXX_COMPILER={}",
-        cc_path, cxx_path
-    );
-    println!("cargo:rustc-env=CMAKE_ARGS={}", cmake_flags);
 }
