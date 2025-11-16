@@ -2,3 +2,35 @@
 name = "zig_passthrough"
 version = "0.1.0"
 edition = "2024"
+
+[[bin]]
+name = "ar"
+path = "src/ar.rs"
+
+[[bin]]
+name = "cc"
+path = "src/cc.rs"
+
+[[bin]]
+name = "cxx"
+path = "src/cxx.rs"
+
+[[bin]]
+name = "dlltool"
+path = "src/dlltool.rs"
+
+[[bin]]
+name = "libtool"
+path = "src/libtool.rs"
+
+[[bin]]
+name = "ranlib"
+path = "src/ranlib.rs"
+
+[[bin]]
+name = "objcopy"
+path = "src/objcopy.rs"
+
+[[bin]]
+name = "rc"
+path = "src/rc.rs"

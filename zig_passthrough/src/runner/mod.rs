@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 
-fn main() -> std::process::ExitCode {
+pub fn run(subcommand: &str) -> std::process::ExitCode {
     let mut args: VecDeque<String> = std::env::args().skip(1).collect();
-    args.push_front(String::from("c++"));
+    args.push_front(String::from(subcommand));
     let command = match std::process::Command::new("zig").args(&args).output() {
         Ok(o) => o,
         Err(e) => {
