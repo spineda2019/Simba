@@ -6,5 +6,5 @@ edition = "2024"
 [dependencies]
 fltk = "1.5.22"
 
-[target.x86_64-pc-windows-gnu]
-linker = "zig cc"
+[build-dependencies]
+zig_passthrough = { path = "../zig_passthrough", artifact = "bin" }
