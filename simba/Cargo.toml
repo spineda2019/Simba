@@ -1,0 +1,10 @@
+[package]
+name = "simba"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+fltk = "1.5.22"
+
+[target.x86_64-pc-windows-gnu]
+linker = "zig cc"
