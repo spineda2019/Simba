@@ -1,4 +1,4 @@
 [workspace]
-members = ["simba", "zig_passthrough"]
+members = ["bootstrap","simba", "zig_passthrough"]
 default-members = ["simba"]
 resolver = "3"
