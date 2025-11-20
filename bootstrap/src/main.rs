@@ -1,3 +1,5 @@
+use std::{path::Path, process::Command};
+
 mod target_info {
     pub mod error {
         #[derive(Debug)]
@@ -322,8 +324,49 @@ mod arg_parsing {
 
 fn main() -> Result<(), target_info::error::TripleError> {
     let target: target_info::ZigTriple = arg_parsing::get_target()?;
-
     target.print();
+
+    const CARGO_EXE_PATH: &str = env!("CARGO");
+    let bootstrap_package_path: &Path = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let workspace_path: &Path = bootstrap_package_path
+        .parent()
+        .expect("Could not find Workspace path");
+    let workspace_path: &str = workspace_path
+        .to_str()
+        .expect("could not convert Workspace path to str");
+
+    println!(
+        "bootstrapping toolchain by calling {} from {}",
+        CARGO_EXE_PATH, workspace_path
+    );
+
+    let cmd = Command::new(CARGO_EXE_PATH)
+        .current_dir(workspace_path)
+        .args(["build", "-p", "zig_passthrough", "--release"])
+        .output()
+        .expect("Failed to build zig bootstrap...");
+
+    match cmd.status.success() {
+        true => {
+            print!(
+                "{}",
+                cmd.stdout
+                    .iter()
+                    .map(|byte| char::from(*byte))
+                    .collect::<String>()
+            );
+        }
+        false => {
+            eprint!(
+                "{}",
+                cmd.stderr
+                    .iter()
+                    .map(|byte| char::from(*byte))
+                    .collect::<String>()
+            );
+            std::process::exit(1);
+        }
+    }
 
     Ok(())
 }
