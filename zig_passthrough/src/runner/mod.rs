@@ -1,8 +1,11 @@
 use std::collections::VecDeque;
 
 pub fn run(subcommand: &str) -> std::process::ExitCode {
+    const ZIG_TRIPLE: &str = env!("ZIG_TRIPLE");
     let mut args: VecDeque<String> = std::env::args().skip(1).collect();
     args.push_front(String::from(subcommand));
+    args.push_back("-target".to_string());
+    args.push_back(ZIG_TRIPLE.to_string());
     let command = match std::process::Command::new("zig").args(&args).output() {
         Ok(o) => o,
         Err(e) => {

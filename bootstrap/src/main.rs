@@ -32,6 +32,16 @@ mod target_info {
             }
         }
     }
+    impl std::fmt::Display for Arch {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Arch::X86 => write!(f, "x86"),
+                Arch::X64 => write!(f, "x86_64"),
+                Arch::Arm => write!(f, "arm"),
+                Arch::Aarch64 => write!(f, "aarch64"),
+            }
+        }
+    }
 
     #[derive(Debug, PartialEq)]
     pub enum Os {
@@ -52,6 +62,15 @@ mod target_info {
             }
         }
     }
+    impl std::fmt::Display for Os {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Os::Linux => write!(f, "linux"),
+                Os::Windows => write!(f, "windows"),
+                Os::MacOS => write!(f, "macos"),
+            }
+        }
+    }
 
     #[derive(Debug, PartialEq)]
     pub enum Abi {
@@ -69,6 +88,15 @@ mod target_info {
                 "none" => Ok(Abi::None),
                 // TODO: MSVC?
                 other => Err(error::TripleError::UnrecognizedAbi(other.to_string())),
+            }
+        }
+    }
+    impl std::fmt::Display for Abi {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Abi::Gnu => write!(f, "gnu"),
+                Abi::Musl => write!(f, "musl"),
+                Abi::None => write!(f, "none"),
             }
         }
     }
@@ -291,6 +319,10 @@ mod target_info {
             println!("\tABI: {:?}", self.abi);
             println!();
         }
+
+        pub fn str(&self) -> String {
+            format!("{}-{}-{}", self.arch, self.os, self.abi)
+        }
     }
 }
 
@@ -342,7 +374,15 @@ fn main() -> Result<(), target_info::error::TripleError> {
 
     let cmd = Command::new(CARGO_EXE_PATH)
         .current_dir(workspace_path)
-        .args(["build", "-p", "zig_passthrough", "--release"])
+        .env("ZIG_TRIPLE", target.str()) // will be available to the passthrough package's build.rs
+        .args([
+            "build",
+            "-p",
+            "zig_passthrough",
+            "--release",
+            "--target-dir",
+            "zig-toolchain",
+        ])
         .output()
         .expect("Failed to build zig bootstrap...");
 
