@@ -5,15 +5,3 @@ edition = "2024"
 
 [dependencies]
 fltk = "1.5.22"
-
-[build-dependencies]
-zig_passthrough = { path = "../zig_passthrough", artifact = [
-    "bin:ar",
-    "bin:cc",
-    "bin:cxx",
-    "bin:dlltool",
-    "bin:libtool",
-    "bin:objcopy",
-    "bin:ranlib",
-    "bin:rc",
-] }

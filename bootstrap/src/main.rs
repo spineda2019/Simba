@@ -1,4 +1,8 @@
-use std::{path::Path, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+    str::FromStr,
+};
 
 mod target_info {
     pub mod error {
@@ -42,6 +46,36 @@ mod target_info {
             }
         }
     }
+    pub enum RustArch {
+        I686,
+        X64,
+        Arm,
+        Aarch64,
+    }
+    impl std::fmt::Display for RustArch {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::I686 => write!(f, "i686"),
+                Self::X64 => write!(f, "x86_64"),
+                Self::Arm => write!(f, "arm"),
+                Self::Aarch64 => write!(f, "aarch64"),
+            }
+        }
+    }
+    pub enum RustVendor {
+        Pc,
+        Apple,
+        Unknown,
+    }
+    impl std::fmt::Display for RustVendor {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::Pc => write!(f, "pc"),
+                Self::Apple => write!(f, "apple"),
+                Self::Unknown => write!(f, "unknown"),
+            }
+        }
+    }
 
     #[derive(Debug, PartialEq)]
     pub enum Os {
@@ -68,6 +102,20 @@ mod target_info {
                 Os::Linux => write!(f, "linux"),
                 Os::Windows => write!(f, "windows"),
                 Os::MacOS => write!(f, "macos"),
+            }
+        }
+    }
+    pub enum RustOs {
+        Linux,
+        Darwin,
+        Windows,
+    }
+    impl std::fmt::Display for RustOs {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::Linux => write!(f, "linux"),
+                Self::Darwin => write!(f, "darwin"),
+                Self::Windows => write!(f, "windows"),
             }
         }
     }
@@ -100,6 +148,22 @@ mod target_info {
             }
         }
     }
+    pub enum RustAbi {
+        Gnu,
+        Musl,
+        /// gnu abi is specified differently between ARM and x86 on windows.
+        /// e.g x86_64-pc-windows-gnu vs aarch64-pc-windows-gnullvm
+        GnuLlvm,
+    }
+    impl std::fmt::Display for RustAbi {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::Gnu => write!(f, "gnu"),
+                Self::Musl => write!(f, "musl"),
+                Self::GnuLlvm => write!(f, "gnullvm"),
+            }
+        }
+    }
 
     pub struct ZigTriple {
         arch: Arch,
@@ -107,76 +171,210 @@ mod target_info {
         abi: Abi,
     }
 
+    /// Frustratingly, rust targets look a bit different than zig triples (which are a bit more
+    /// intuitive IMO) so we have to represent them differently
+    pub struct RustTarget {
+        arch: RustArch,
+        vendor: RustVendor,
+        os: RustOs,
+        abi: Option<RustAbi>,
+    }
+    impl RustTarget {
+        pub fn str(&self) -> String {
+            if let Some(abi) = &self.abi {
+                format!("{}-{}-{}-{}", self.arch, self.vendor, self.os, abi)
+            } else {
+                format!("{}-{}-{}", self.arch, self.vendor, self.os)
+            }
+        }
+
+        pub fn print(&self) {
+            println!("Target maps to the following valid rust-style triple:");
+            println!("\tArchitecture: {}", self.arch);
+            println!("\tVendor: {}", self.vendor);
+            println!("\tOS: {}", self.os);
+            if let Some(abi) = &self.abi {
+                println!("\tABI: {}", abi);
+            }
+            println!();
+        }
+    }
+
     impl ZigTriple {
-        const ALLOWED: [ZigTriple; 13] = [
-            ZigTriple {
-                arch: Arch::X86,
-                os: Os::Windows,
-                abi: Abi::Gnu,
-            },
-            ZigTriple {
-                arch: Arch::X64,
-                os: Os::Windows,
-                abi: Abi::Gnu,
-            },
-            ZigTriple {
-                arch: Arch::Aarch64,
-                os: Os::Windows,
-                abi: Abi::Gnu,
-            },
-            ZigTriple {
-                arch: Arch::X64,
-                os: Os::MacOS,
-                abi: Abi::None,
-            },
-            ZigTriple {
-                arch: Arch::Aarch64,
-                os: Os::MacOS,
-                abi: Abi::None,
-            },
-            ZigTriple {
-                arch: Arch::X86,
-                os: Os::Linux,
-                abi: Abi::Gnu,
-            },
-            ZigTriple {
-                arch: Arch::X64,
-                os: Os::Linux,
-                abi: Abi::Gnu,
-            },
-            ZigTriple {
-                arch: Arch::Arm,
-                os: Os::Linux,
-                abi: Abi::Gnu,
-            },
-            ZigTriple {
-                arch: Arch::Aarch64,
-                os: Os::Linux,
-                abi: Abi::Gnu,
-            },
-            ZigTriple {
-                arch: Arch::X86,
-                os: Os::Linux,
-                abi: Abi::Musl,
-            },
-            ZigTriple {
-                arch: Arch::X64,
-                os: Os::Linux,
-                abi: Abi::Musl,
-            },
-            ZigTriple {
-                arch: Arch::Arm,
-                os: Os::Linux,
-                abi: Abi::Musl,
-            },
-            ZigTriple {
-                arch: Arch::Aarch64,
-                os: Os::Linux,
-                abi: Abi::Musl,
-            },
+        /// Exhaustive list of what we'll allow (and how they map to rust targets)
+        const ALLOWED: [(ZigTriple, RustTarget); 13] = [
+            (
+                ZigTriple {
+                    arch: Arch::X86,
+                    os: Os::Windows,
+                    abi: Abi::Gnu,
+                },
+                RustTarget {
+                    arch: RustArch::I686,
+                    vendor: RustVendor::Pc,
+                    os: RustOs::Windows,
+                    abi: Some(RustAbi::Gnu),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::X64,
+                    os: Os::Windows,
+                    abi: Abi::Gnu,
+                },
+                RustTarget {
+                    arch: RustArch::X64,
+                    vendor: RustVendor::Pc,
+                    os: RustOs::Windows,
+                    abi: Some(RustAbi::Gnu),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::Aarch64,
+                    os: Os::Windows,
+                    abi: Abi::Gnu,
+                },
+                RustTarget {
+                    arch: RustArch::Aarch64,
+                    vendor: RustVendor::Pc,
+                    os: RustOs::Windows,
+                    abi: Some(RustAbi::GnuLlvm),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::X64,
+                    os: Os::MacOS,
+                    abi: Abi::None,
+                },
+                RustTarget {
+                    arch: RustArch::X64,
+                    vendor: RustVendor::Apple,
+                    os: RustOs::Darwin,
+                    abi: None,
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::Aarch64,
+                    os: Os::MacOS,
+                    abi: Abi::None,
+                },
+                RustTarget {
+                    arch: RustArch::Aarch64,
+                    vendor: RustVendor::Apple,
+                    os: RustOs::Darwin,
+                    abi: None,
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::X86,
+                    os: Os::Linux,
+                    abi: Abi::Gnu,
+                },
+                RustTarget {
+                    arch: RustArch::I686,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Gnu),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::X64,
+                    os: Os::Linux,
+                    abi: Abi::Gnu,
+                },
+                RustTarget {
+                    arch: RustArch::X64,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Gnu),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::Arm,
+                    os: Os::Linux,
+                    abi: Abi::Gnu,
+                },
+                RustTarget {
+                    arch: RustArch::Arm,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Gnu),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::Aarch64,
+                    os: Os::Linux,
+                    abi: Abi::Gnu,
+                },
+                RustTarget {
+                    arch: RustArch::Aarch64,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Gnu),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::X86,
+                    os: Os::Linux,
+                    abi: Abi::Musl,
+                },
+                RustTarget {
+                    arch: RustArch::I686,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Musl),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::X64,
+                    os: Os::Linux,
+                    abi: Abi::Musl,
+                },
+                RustTarget {
+                    arch: RustArch::X64,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Musl),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::Arm,
+                    os: Os::Linux,
+                    abi: Abi::Musl,
+                },
+                RustTarget {
+                    arch: RustArch::Arm,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Musl),
+                },
+            ),
+            (
+                ZigTriple {
+                    arch: Arch::Aarch64,
+                    os: Os::Linux,
+                    abi: Abi::Musl,
+                },
+                RustTarget {
+                    arch: RustArch::Aarch64,
+                    vendor: RustVendor::Unknown,
+                    os: RustOs::Linux,
+                    abi: Some(RustAbi::Musl),
+                },
+            ),
         ];
 
-        fn analyze_pieces(pieces: &[&str]) -> Result<ZigTriple, error::TripleError> {
+        fn analyze_pieces(pieces: &[&str]) -> Result<(ZigTriple, RustTarget), error::TripleError> {
             let raw_target = pieces.join("-");
             println!("Parsing {} ...", raw_target);
 
@@ -287,12 +485,12 @@ mod target_info {
 
             let candidate = ZigTriple { arch, os, abi };
 
-            for allowed in &ZigTriple::ALLOWED {
+            for (allowed, rust_mapping) in ZigTriple::ALLOWED {
                 if allowed.arch == candidate.arch
                     && allowed.os == candidate.os
                     && allowed.abi == candidate.abi
                 {
-                    return Ok(candidate);
+                    return Ok((allowed, rust_mapping));
                 }
             }
 
@@ -301,12 +499,12 @@ mod target_info {
             Err(error::TripleError::DisallowedTriple)
         }
 
-        pub fn new(triple: &str) -> Result<ZigTriple, error::TripleError> {
+        pub fn new(triple: &str) -> Result<(ZigTriple, RustTarget), error::TripleError> {
             let pieces: Vec<&str> = triple.split('-').collect();
             ZigTriple::analyze_pieces(&pieces)
         }
 
-        pub fn native() -> Result<ZigTriple, error::TripleError> {
+        pub fn native() -> Result<(ZigTriple, RustTarget), error::TripleError> {
             let native = env!("CARGO_BUILD_TARGET");
             let pieces: Vec<&str> = native.split('-').collect();
             ZigTriple::analyze_pieces(&pieces)
@@ -329,8 +527,13 @@ mod target_info {
 mod arg_parsing {
     use argparse::{ArgumentParser, Store};
 
-    pub fn get_target(
-    ) -> Result<crate::target_info::ZigTriple, crate::target_info::error::TripleError> {
+    pub fn get_target() -> Result<
+        (
+            crate::target_info::ZigTriple,
+            crate::target_info::RustTarget,
+        ),
+        crate::target_info::error::TripleError,
+    > {
         let mut target_str = String::new();
 
         {
@@ -355,8 +558,10 @@ mod arg_parsing {
 }
 
 fn main() -> Result<(), target_info::error::TripleError> {
-    let target: target_info::ZigTriple = arg_parsing::get_target()?;
+    let (target, mapped_rust_target): (target_info::ZigTriple, target_info::RustTarget) =
+        arg_parsing::get_target()?;
     target.print();
+    mapped_rust_target.print();
 
     const CARGO_EXE_PATH: &str = env!("CARGO");
     let bootstrap_package_path: &Path = Path::new(env!("CARGO_MANIFEST_DIR"));
@@ -372,6 +577,8 @@ fn main() -> Result<(), target_info::error::TripleError> {
         CARGO_EXE_PATH, workspace_path
     );
 
+    const TOOLCHAIN_OUT: &str = "zig_toolchain";
+
     let cmd = Command::new(CARGO_EXE_PATH)
         .current_dir(workspace_path)
         .env("ZIG_TRIPLE", target.str()) // will be available to the passthrough package's build.rs
@@ -381,10 +588,95 @@ fn main() -> Result<(), target_info::error::TripleError> {
             "zig_passthrough",
             "--release",
             "--target-dir",
-            "zig-toolchain",
+            TOOLCHAIN_OUT,
         ])
         .output()
         .expect("Failed to build zig bootstrap...");
+
+    match cmd.status.success() {
+        true => {
+            print!(
+                "{}",
+                cmd.stdout
+                    .iter()
+                    .map(|byte| char::from(*byte))
+                    .collect::<String>()
+            );
+        }
+        false => {
+            eprint!(
+                "{}",
+                cmd.stderr
+                    .iter()
+                    .map(|byte| char::from(*byte))
+                    .collect::<String>()
+            );
+            std::process::exit(1);
+        }
+    }
+
+    let native = env!("CARGO_BUILD_TARGET");
+
+    let workspace_dir = PathBuf::from_str(workspace_path).unwrap();
+
+    let toolchain_build_dir = PathBuf::from_str(workspace_path)
+        .unwrap()
+        .join(TOOLCHAIN_OUT)
+        .join(native)
+        .join("release");
+
+    let toolchain_destination_dir = PathBuf::from_str(workspace_path)
+        .unwrap()
+        .join(TOOLCHAIN_OUT)
+        .join("dist")
+        .join(target.str());
+
+    if !toolchain_destination_dir.exists() {
+        std::fs::create_dir(&toolchain_destination_dir).unwrap();
+    }
+
+    for entry in std::fs::read_dir(&toolchain_build_dir).unwrap() {
+        let entry = entry.unwrap();
+        let file_type = entry.file_type().unwrap();
+
+        let path = entry.path();
+
+        // Construct the corresponding destination path
+        // We use file_name() to get just the last component (e.g., "file.txt")
+        // and push it onto the destination root.
+        let dest_path = toolchain_destination_dir.join(entry.file_name());
+
+        if !file_type.is_dir() {
+            let _ = std::fs::copy(&path, &dest_path);
+        }
+    }
+
+    println!(
+        "Placing bootstrapped tools from {} in {}",
+        toolchain_build_dir.to_str().unwrap(),
+        toolchain_destination_dir.to_str().unwrap()
+    );
+
+    println!("Using bootstrapped zig passthrough to build project");
+    println!();
+
+    let cmd = Command::new(CARGO_EXE_PATH)
+        .current_dir(workspace_path)
+        .env(
+            "CMAKE_TOOLCHAIN_FILE",
+            workspace_dir.join("toolchain.cmake"),
+        )
+        .env("TOOLCHAIN_DIR", toolchain_destination_dir)
+        .args([
+            "build",
+            "-p",
+            "simba",
+            "--release",
+            "--target",
+            &mapped_rust_target.str(),
+        ])
+        .output()
+        .expect("Failed to build simba...");
 
     match cmd.status.success() {
         true => {
