@@ -1,5 +1,5 @@
 mod runner;
 
 fn main() -> std::process::ExitCode {
-    runner::run("c++")
+    runner::run("c++", true)
 }

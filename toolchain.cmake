@@ -32,8 +32,8 @@ set(CMAKE_CXX_COMPILER "${ZIG_WRAPPER_DIR}/cxx"
     FILEPATH
     "C++ Compiler"
     FORCE)
+set(CMAKE_LINKER "${CMAKE_C_COMPILER}" CACHE FILEPATH "Linker" FORCE)
 
 # Optional: Point to other common binutils if they reside in the same directory
 set(CMAKE_AR "${ZIG_WRAPPER_DIR}/ar" CACHE FILEPATH "Archiver" FORCE)
 set(CMAKE_RANLIB "${ZIG_WRAPPER_DIR}/ranlib" CACHE FILEPATH "Ranlib" FORCE)
-set(CMAKE_LINKER "${ZIG_WRAPPER_DIR}/ld" CACHE FILEPATH "Linker" FORCE)
