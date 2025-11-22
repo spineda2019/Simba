@@ -557,6 +557,31 @@ mod arg_parsing {
     }
 }
 
+struct CargoRunner {
+    cargo_exe_path: &'static str,
+    toolchain_output_root: &'static str,
+}
+
+impl CargoRunner {
+    pub fn new(_cargo_exe_path: &'static str, _toolchain_output_root: &'static str) -> Self {
+        /*
+        Self {
+            cargo_exe_path,
+            toolchain_output_root,
+        }
+        */
+        todo!()
+    }
+
+    pub fn init_directories(&self) {
+        todo!()
+    }
+
+    pub fn build() {
+        todo!()
+    }
+}
+
 fn main() -> Result<(), target_info::error::TripleError> {
     let (target, mapped_rust_target): (target_info::ZigTriple, target_info::RustTarget) =
         arg_parsing::get_target()?;
@@ -564,6 +589,10 @@ fn main() -> Result<(), target_info::error::TripleError> {
     mapped_rust_target.print();
 
     const CARGO_EXE_PATH: &str = env!("CARGO");
+    const TOOLCHAIN_OUT: &str = "zig_toolchain";
+
+    // let cargo_runner: CargoRunner = CargoRunner::new(CARGO_EXE_PATH, TOOLCHAIN_OUT);
+
     let bootstrap_package_path: &Path = Path::new(env!("CARGO_MANIFEST_DIR"));
     let workspace_path: &Path = bootstrap_package_path
         .parent()
@@ -576,8 +605,6 @@ fn main() -> Result<(), target_info::error::TripleError> {
         "bootstrapping toolchain by calling {} from {}",
         CARGO_EXE_PATH, workspace_path
     );
-
-    const TOOLCHAIN_OUT: &str = "zig_toolchain";
 
     let cmd = Command::new(CARGO_EXE_PATH)
         .current_dir(workspace_path)
@@ -625,6 +652,11 @@ fn main() -> Result<(), target_info::error::TripleError> {
         .join(native)
         .join("release");
 
+    let toolchain_distribution_dir = PathBuf::from_str(workspace_path)
+        .unwrap()
+        .join(TOOLCHAIN_OUT)
+        .join("dist");
+
     let toolchain_destination_dir = PathBuf::from_str(workspace_path)
         .unwrap()
         .join(TOOLCHAIN_OUT)
@@ -632,6 +664,9 @@ fn main() -> Result<(), target_info::error::TripleError> {
         .join(target.str());
 
     if !toolchain_destination_dir.exists() {
+        if !toolchain_distribution_dir.exists() {
+            std::fs::create_dir(&toolchain_distribution_dir).unwrap();
+        }
         std::fs::create_dir(&toolchain_destination_dir).unwrap();
     }
 
