@@ -505,7 +505,7 @@ mod target_info {
         }
 
         pub fn native() -> Result<(ZigTriple, RustTarget), error::TripleError> {
-            let native = env!("CARGO_BUILD_TARGET");
+            let native = env!("CARGO_HOST_TARGET");
             let pieces: Vec<&str> = native.split('-').collect();
             ZigTriple::analyze_pieces(&pieces)
         }
@@ -642,14 +642,13 @@ fn main() -> Result<(), target_info::error::TripleError> {
         }
     }
 
-    let native = env!("CARGO_BUILD_TARGET");
+    let native = env!("CARGO_HOST_TARGET");
 
     let workspace_dir = PathBuf::from_str(workspace_path).unwrap();
 
     let toolchain_build_dir = PathBuf::from_str(workspace_path)
         .unwrap()
         .join(TOOLCHAIN_OUT)
-        .join(native)
         .join("release");
 
     let toolchain_distribution_dir = PathBuf::from_str(workspace_path)
@@ -670,6 +669,7 @@ fn main() -> Result<(), target_info::error::TripleError> {
         std::fs::create_dir(&toolchain_destination_dir).unwrap();
     }
 
+    dbg!(&toolchain_build_dir);
     for entry in std::fs::read_dir(&toolchain_build_dir).unwrap() {
         let entry = entry.unwrap();
         let file_type = entry.file_type().unwrap();
@@ -693,6 +693,10 @@ fn main() -> Result<(), target_info::error::TripleError> {
     );
 
     println!("Using bootstrapped zig passthrough to build project");
+    println!(
+        "Passing follwoing target to rust: {}",
+        &mapped_rust_target.str()
+    );
     println!();
 
     let cmd = Command::new(CARGO_EXE_PATH)
