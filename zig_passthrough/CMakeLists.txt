@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.20)  # needed for C++23
 project(ZigPassthrough)
 
-add_executable(ar "src/main.cpp")
-add_executable(cc "src/main.cpp")
-add_executable(cxx "src/main.cpp")
+add_executable(ar      "src/main.cpp")
+add_executable(cc      "src/main.cpp")
+add_executable(cxx     "src/main.cpp")
 add_executable(dlltool "src/main.cpp")
-add_executable(lib "src/main.cpp")
+add_executable(lib     "src/main.cpp")
 add_executable(objcopy "src/main.cpp")
-add_executable(ranlib "src/main.cpp")
-add_executable(rc "src/main.cpp")
+add_executable(ranlib  "src/main.cpp")
+add_executable(rc      "src/main.cpp")
 
 # Pass the CMake variable to the C++ code as a macro
 # This creates a definition like: #define GREETING_NAME "World"
