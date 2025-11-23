@@ -1,21 +1,33 @@
-use std::path::PathBuf;
+use std::{fmt::format, path::PathBuf, str::FromStr};
 
 fn main() {
-    // these are provided by cargo since zig_passthrough is a binary dependency.
     let target = std::env::var("TARGET").expect("TARGET environment variable must be specified");
-    // e.g., X86_64_PC_WINDOWS_GNU
-    let target_var_name = target.replace('-', "_").to_uppercase();
-    let zig_toolchain_distribution_dir = std::env::var("TOOLCHAIN_DIR").expect(concat!(
-        "Environment variable 'TOOLCHAIN_DIR' is not set. This should ",
-        "be set by the bootstrapper and point to the output zig ",
-        "wrappers (though this can be done manually)"
-    ));
-    let zig_toolchain_distribution_dir: PathBuf = zig_toolchain_distribution_dir.into();
+    let host = std::env::var("HOST").expect("TARGET environment variable must be specified");
 
-    // println actually sets the variables (for some reason?)
-    println!(
-        "cargo:rustc-env=CARGO_TARGET_{}_LINKER={}",
-        target_var_name,
-        zig_toolchain_distribution_dir.join("cc").to_str().unwrap()
-    );
+    // Check if we are cross-compiling
+    if target != host {
+        let zig_toolchain_distribution_dir = std::env::var("TOOLCHAIN_DIR").expect(concat!(
+            "Environment variable 'TOOLCHAIN_DIR' is not set. This should ",
+            "be set by the bootstrapper and point to the output zig ",
+            "wrappers (though this can be done manually)"
+        ));
+        let zig_toolchain_distribution_dir: PathBuf = zig_toolchain_distribution_dir.into();
+
+        // println actually sets the variables (for some reason?)
+        let linker_var = format!(
+            "CARGO_TARGET_{}_LINKER",
+            target.replace('-', "_").to_uppercase()
+        );
+        println!(
+            "cargo:rustc-env={}={}",
+            &linker_var,
+            zig_toolchain_distribution_dir.join("cc").to_str().unwrap()
+        );
+
+        println!(
+            "cargo:warning=LOOKATME->{}={}",
+            &linker_var,
+            std::env::var(&linker_var).unwrap_or(String::from("UNSET"))
+        );
+    }
 }
