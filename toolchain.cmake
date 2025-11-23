@@ -10,7 +10,7 @@ set(ZIG_WRAPPER_DIR $ENV{TOOLCHAIN_DIR})
 
 # Check if the environment variable was actually provided
 if(NOT ZIG_WRAPPER_DIR)
-    message(FATAL_ERROR "Error: Environment variable 'TOOLCHAIN_DIR' is not
+    message(FATAL_ERROR "Environment variable 'TOOLCHAIN_DIR' is not
                          set. This should be set by the bootstrapper and point
                          to the output zig wrappers (though this can be done
                          manually)")

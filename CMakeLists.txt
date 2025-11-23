@@ -1,30 +1,56 @@
-cmake_minimum_required(VERSION 3.15)
+################################################################################
+#                             Top Level Superbuild                             #
+#                                                                              #
+# Bootraps build tools (by simply wrapping zig sub commands into a single      #
+# executable), Then uses these to build the actual simba project itself        #
+################################################################################
+
+cmake_minimum_required(VERSION 3.20)
+project(superbuild NONE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+include(ExternalProject)
 
-# TODO: Shim in zig
-# set(CMAKE_C_COMPILER "zig")
-# set(CMAKE_C_COMPILER_ARG1 "cc")
-# set(CMAKE_CXX_COMPILER "zig")
-# set(CMAKE_CXX_COMPILER_ARG1 "c++")
+set(EXTERNAL_PREFIX "${CMAKE_BINARY_DIR}/zig_bootstrap")
+set(EXTERNAL_INSTALL_DIR "${EXTERNAL_PREFIX}/install")
 
-project(simba LANGUAGES CXX DESCRIPTION "The SimpleBudgetingApp")
+set(target "" CACHE STRING "Zig triple to target")
 
-include(FetchContent)  # For FLTK
+if(target STREQUAL "")
+    message(FATAL_ERROR "-Dtarget MUST be specified")
+else()
+    message(STATUS "Bootstrapping for target: ${target}")
+endif()
 
-set(FLTK_BUILD_EXAMPLES OFF CACHE BOOL "Disable FLTK examples")
-set(FLTK_BUILD_TEST OFF CACHE BOOL "Disable FLTK tests")
+ExternalProject_Add(ZigPassthrough
+                    PREFIX ${EXTERNAL_PREFIX}
+                    SOURCE_DIR "${CMAKE_SOURCE_DIR}/zig_passthrough"
+                    CMAKE_ARGS
+                    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+                        -Dtarget=${target}
+                        -DCMAKE_BUILD_TYPE=release  # TODO: Ensure single
+                                                    # config generator
+                        -DCMAKE_INSTALL_PREFIX=${EXTERNAL_INSTALL_DIR}
+                    BUILD_BYPRODUCTS
+                        "${EXTERNAL_INSTALL_DIR}/bin/ar"
+                        "${EXTERNAL_INSTALL_DIR}/bin/cc"
+                        "${EXTERNAL_INSTALL_DIR}/bin/cxx"
+                        "${EXTERNAL_INSTALL_DIR}/bin/dlltool"
+                        "${EXTERNAL_INSTALL_DIR}/bin/lib"
+                        "${EXTERNAL_INSTALL_DIR}/bin/objcopy"
+                        "${EXTERNAL_INSTALL_DIR}/bin/ranlib"
+                        "${EXTERNAL_INSTALL_DIR}/bin/rc")
 
-FetchContent_Declare(
-  fltk
-  GIT_REPOSITORY https://github.com/fltk/fltk.git
-  GIT_TAG        release-1.4.4
-  SYSTEM         # Suppress warning lib authors caused
-)
-
-# 7. Make FLTK available. This downloads and adds it as a sub-project.
-FetchContent_MakeAvailable(fltk)
-
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-add_subdirectory(simba)
+ExternalProject_Add(simba
+                    SOURCE_DIR "${CMAKE_SOURCE_DIR}/simba"
+                    CMAKE_ARGS
+                    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+                        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                        -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                        #                Bootstrapped Tools                #
+                        -DCMAKE_C_COMPILER=${EXTERNAL_INSTALL_DIR}/bin/cc
+                        -DCMAKE_CXX_COMPILER=${EXTERNAL_INSTALL_DIR}/bin/cxx
+                        -DCMAKE_AR=${EXTERNAL_INSTALL_DIR}/bin/ar
+                        -DCMAKE_RANLIB=${EXTERNAL_INSTALL_DIR}/bin/ranlib
+                        -DCMAKE_OBJCOPY=${EXTERNAL_INSTALL_DIR}/bin/objcopy
+                        -DCMAKE_RC_COMPILER=${EXTERNAL_INSTALL_DIR}/bin/rc
+                    DEPENDS ZigPassthrough)
