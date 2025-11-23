@@ -6,9 +6,9 @@ pub struct MainWindow {
 }
 
 impl MainWindow {
-    pub fn new(width: i32, height: i32, title: &str) -> Self {
-        let window = fltk::window::Window::new(0, 0, width, height, title);
-        let mut frame = fltk::frame::Frame::new(20, 40, width / 2, height / 2, title);
+    pub fn new(width: crate::common::Width, height: crate::common::Height, title: &str) -> Self {
+        let window = fltk::window::Window::new(0, 0, width.0, height.0, title);
+        let mut frame = fltk::frame::Frame::new(20, 40, width.0 / 2, height.0 / 2, title);
         frame.set_frame(fltk::enums::FrameType::UpBox);
         frame.set_label_size(36);
         window.end();
