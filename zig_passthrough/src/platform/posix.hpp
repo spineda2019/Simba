@@ -77,6 +77,7 @@ void execute_child_zig(const std::span<char *> args) {
         built_args.push_back(zig_triple.begin());
     }
     built_args.append_range(args);
+    built_args.push_back(nullptr);
 
     pid_t pid{fork()};
     if (pid < 0) {
