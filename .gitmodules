@@ -1,0 +1,3 @@
+[submodule "simba/fltk"]
+	path = simba/fltk
+	url = https://github.com/fltk/fltk.git
