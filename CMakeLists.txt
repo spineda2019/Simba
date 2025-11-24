@@ -43,7 +43,6 @@ ExternalProject_Add(ZigPassthrough
 ExternalProject_Add(simba
                     SOURCE_DIR "${CMAKE_SOURCE_DIR}/simba"
                     CMAKE_ARGS
-                    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
                         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                         #                Bootstrapped Tools                #

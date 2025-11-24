@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.20)  # needed for C++23
 project(simba LANGUAGES CXX DESCRIPTION "The SimpleBudgetingApp")
 
 include(FetchContent)  # For FLTK
-add_executable(simba main.cpp)
+add_executable(simba main.cpp MainWindow.cpp)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(FLTK_BUILD_EXAMPLES OFF CACHE BOOL "Disable FLTK examples")
 set(FLTK_BUILD_TEST OFF CACHE BOOL "Disable FLTK tests")
@@ -26,4 +28,5 @@ target_compile_options(simba PRIVATE -Wall
                                      -Wshadow
                                      -Wconversion
                                      -Werror)
+target_include_directories(simba PRIVATE "${FLTK_SOURCE_DIR}/include")
 target_link_libraries(simba PRIVATE fltk::fltk)
