@@ -2,6 +2,7 @@
 zig-out/
 .cache/
 build/
+compile_commands.json
 
 
 # Added by cargo

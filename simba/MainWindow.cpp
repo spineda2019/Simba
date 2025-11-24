@@ -7,16 +7,18 @@
 
 namespace simba {
 MainWindow::MainWindow(int width, int height) noexcept
-    : window_{0, 0, width, height, ""},
-      grand_total_box{(width - (width / 2)) / 2, 40, width / 2, height / 5, ""},
-      load_alternate_button_{((width / 2) - (width / 5)) / 2, 0, 0, 0, ""} {
+    : window_{0, 0, width, height, "Simba"},
+      grand_total_box{(width - (width / 2)) / 2, 40, width / 2, height / 5,
+                      "Grand Total:"},
+      load_alternate_button_{((width / 2) - (width / 5)) / 2, 0, 0, 0, "Load"} {
     grand_total_box.box(FL_UP_BOX);
     grand_total_box.labelfont(FL_BOLD + FL_ITALIC);
+    grand_total_box.labelsize(36);
 
     load_alternate_button_.type(FL_NORMAL_BUTTON);
 
     window_.end();
 }
 
-void MainWindow::show() { window_.show(); }
+void MainWindow::show() noexcept { window_.show(); }
 }  // namespace simba
