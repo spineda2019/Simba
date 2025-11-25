@@ -1,7 +1,7 @@
 // Copyright 2025 Sebastian Pineda (spineda.wpi.alum@gmail.com)
 
-#ifndef SIMBA_INCLUDE_MAINWINDOW_HPP_
-#define SIMBA_INCLUDE_MAINWINDOW_HPP_
+#ifndef SIMBA_VIEWS_MAINWINDOW_HPP_
+#define SIMBA_VIEWS_MAINWINDOW_HPP_
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
@@ -19,7 +19,9 @@ class MainWindow final {
         return MainWindow{MainWindowSize<Width, Height>{}};
     }
 
-    void show() noexcept;
+    void Show() noexcept;
+
+    void LoadConfigClicked();
 
     ~MainWindow() = default;
     explicit MainWindow(const MainWindow&) = delete;
@@ -38,11 +40,16 @@ class MainWindow final {
           load_alternate_button_{
               ButtonXPosition<Width>::value, ButtonYPosition<Height>::value,
               ButtonWidth<Width>::value, ButtonHeight<Height>::value, "Load"} {
+        //
         grand_total_box.box(FL_UP_BOX);
         grand_total_box.labelfont(FL_BOLD + FL_ITALIC);
         grand_total_box.labelsize(36);
 
+        const auto button_callback = [](Fl_Widget*, void* self) {
+            static_cast<decltype(this)>(self)->LoadConfigClicked();
+        };
         load_alternate_button_.type(FL_NORMAL_BUTTON);
+        load_alternate_button_.callback(button_callback, this);
 
         window_.end();
     }
@@ -102,4 +109,4 @@ class MainWindow final {
 };
 }  // namespace simba
 
-#endif  // SIMBA_INCLUDE_MAINWINDOW_HPP_
+#endif  // SIMBA_VIEWS_MAINWINDOW_HPP_

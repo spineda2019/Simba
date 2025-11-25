@@ -4,10 +4,10 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Window.H>
 
-#include "include/MainWindow.hpp"
+#include "views/MainWindow.hpp"
 
 int main() {
     simba::MainWindow window{simba::MainWindow::New<600, 600>()};
-    window.show();
+    window.Show();
     return Fl::run();
 }

@@ -1,11 +1,15 @@
 // Copyright 2025 Sebastian Pineda (spineda.wpi.alum@gmail.com)
 
-#include "include/MainWindow.hpp"
+#include "views/MainWindow.hpp"
 
 #include <FL/Enumerations.H>
 #include <FL/Fl_Button.H>
 
+#include "logic/filesystem.hpp"
+
 namespace simba {
 
-void MainWindow::show() noexcept { window_.show(); }
+void MainWindow::Show() noexcept { window_.show(); }
+void MainWindow::LoadConfigClicked() { fs::GetConfigFile(); }
+
 }  // namespace simba
