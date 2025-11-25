@@ -11,9 +11,89 @@ namespace simba {
 
 class MainWindow final {
  public:
-    explicit MainWindow(int width, int height) noexcept;
+    template <int Width, int Height>
+    struct MainWindowSize {};
+
+    template <int Width, int Height>
+    static inline MainWindow New() {
+        return MainWindow{MainWindowSize<Width, Height>{}};
+    }
 
     void show() noexcept;
+
+    ~MainWindow() = default;
+    explicit MainWindow(const MainWindow&) = delete;
+    MainWindow& operator=(const MainWindow&) = delete;
+    explicit MainWindow(MainWindow&&) = delete;
+    MainWindow& operator=(MainWindow&&) = delete;
+
+ private:
+    template <int Width, int Height>
+    explicit inline MainWindow(MainWindowSize<Width, Height>) noexcept
+        : window_{0, 0, Width, Height, "Simba"},
+          grand_total_box{FrameXPosition<Width>::value,
+                          FrameYPosition<Height>::value,
+                          FrameWidth<Width>::value, FrameHeight<Height>::value,
+                          "Grand Total:"},
+          load_alternate_button_{
+              ButtonXPosition<Width>::value, ButtonYPosition<Height>::value,
+              ButtonWidth<Width>::value, ButtonHeight<Height>::value, "Load"} {
+        grand_total_box.box(FL_UP_BOX);
+        grand_total_box.labelfont(FL_BOLD + FL_ITALIC);
+        grand_total_box.labelsize(36);
+
+        load_alternate_button_.type(FL_NORMAL_BUTTON);
+
+        window_.end();
+    }
+
+    template <int ParentWidth>
+    struct FrameWidth {
+        inline static constexpr int value{ParentWidth / 2};
+    };
+
+    template <int ParentHeight>
+    struct FrameHeight {
+        inline static constexpr int value{ParentHeight / 5};
+    };
+
+    template <int ParentWidth>
+    struct FrameXPosition {
+        inline static constexpr int value{
+            (ParentWidth - FrameWidth<ParentWidth>::value) / 2};
+    };
+
+    template <int ParentWidth>
+    struct FrameYPosition {
+        // TODO(SEP): Calculate
+        inline static constexpr int value{40};
+    };
+
+    template <int ParentWidth>
+    struct ButtonWidth {
+        inline static constexpr int value{ParentWidth / 5};
+    };
+
+    template <int ParentHeight>
+    struct ButtonHeight {
+        inline static constexpr int value{ParentHeight / 10};
+    };
+
+    template <int ParentWidth>
+    struct ButtonXPosition {
+        inline static constexpr int value{
+            ((ParentWidth / 2) - ButtonWidth<ParentWidth>::value) / 2};
+    };
+
+    template <int ParentHeight>
+    struct ButtonYPosition {
+        inline static constexpr int value{
+            FrameYPosition<ParentHeight>::value +
+            FrameHeight<ParentHeight>::value +
+            ((ParentHeight - (FrameYPosition<ParentHeight>::value +
+                              FrameHeight<ParentHeight>::value)) /
+             10)};
+    };
 
  private:
     Fl_Window window_;

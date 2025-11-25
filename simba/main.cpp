@@ -9,7 +9,7 @@
 int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
-    simba::MainWindow window{600, 600};
+    simba::MainWindow window{simba::MainWindow::New<600, 600>()};
     window.show();
     return Fl::run();
 }
