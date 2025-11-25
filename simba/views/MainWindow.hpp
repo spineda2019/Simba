@@ -36,10 +36,11 @@ class MainWindow final {
           grand_total_box{FrameXPosition<Width>::value,
                           FrameYPosition<Height>::value,
                           FrameWidth<Width>::value, FrameHeight<Height>::value,
-                          "Grand Total:"},
+                          "Balance: TODO"},
           load_alternate_button_{
               ButtonXPosition<Width>::value, ButtonYPosition<Height>::value,
-              ButtonWidth<Width>::value, ButtonHeight<Height>::value, "Load"} {
+              ButtonWidth<Width>::value, ButtonHeight<Height>::value,
+              "Load Other Config"} {
         //
         grand_total_box.box(FL_UP_BOX);
         grand_total_box.labelfont(FL_BOLD + FL_ITALIC);
@@ -78,7 +79,7 @@ class MainWindow final {
 
     template <int ParentWidth>
     struct ButtonWidth {
-        inline static constexpr int value{ParentWidth / 5};
+        inline static constexpr int value{ParentWidth / 4};
     };
 
     template <int ParentHeight>
