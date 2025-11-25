@@ -6,9 +6,7 @@
 
 #include "include/MainWindow.hpp"
 
-int main(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
+int main() {
     simba::MainWindow window{simba::MainWindow::New<600, 600>()};
     window.show();
     return Fl::run();
