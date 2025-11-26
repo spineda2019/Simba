@@ -21,15 +21,13 @@ FetchContent_Declare(
 # 7. Make FLTK available. This downloads and adds it as a sub-project.
 FetchContent_MakeAvailable(fltk)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
 target_compile_options(simba PRIVATE -Wall
                                      -Wextra
                                      -Wpedantic
                                      -Wshadow
                                      -Wconversion
                                      -Werror)
+target_compile_features(simba PUBLIC cxx_std_23)
 target_include_directories(simba PRIVATE "${FLTK_SOURCE_DIR}/include")
 target_include_directories(simba PRIVATE "${CMAKE_SOURCE_DIR}")
 target_link_libraries(simba PRIVATE fltk::fltk)
