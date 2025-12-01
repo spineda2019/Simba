@@ -21,11 +21,19 @@ else()
     message(STATUS "Bootstrapping for target: ${target}")
 endif()
 
+if(NOT ${target} MATCHES "^([a-zZ-Z0-9_]+)-([a-zZ-Z0-9_]+)-([a-zZ-Z0-9_.]+)$")
+    message(FATAL_ERROR "Expected target=<arch>-<os>-<abi>")
+endif()
+
+set(ZIG_ARCH ${CMAKE_MATCH_1})
+set(ZIG_OS ${CMAKE_MATCH_2})
+set(ZIG_ABI ${CMAKE_MATCH_3})
+
 ExternalProject_Add(ZigPassthrough
                     PREFIX ${EXTERNAL_PREFIX}
                     SOURCE_DIR "${CMAKE_SOURCE_DIR}/zig_passthrough"
                     CMAKE_ARGS
-                    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+                        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
                         -Dtarget=${target}
                         -DCMAKE_BUILD_TYPE=release  # TODO: Ensure single
                                                     # config generator
@@ -40,16 +48,20 @@ ExternalProject_Add(ZigPassthrough
                         "${EXTERNAL_INSTALL_DIR}/bin/ranlib"
                         "${EXTERNAL_INSTALL_DIR}/bin/rc")
 
+message(STATUS "Superbuild: Arch: ${ZIG_ARCH}")
+message(STATUS "Superbuild: OS: ${ZIG_OS}")
+message(STATUS "Superbuild: ABI: ${ZIG_ABI}")
+
 ExternalProject_Add(simba
                     SOURCE_DIR "${CMAKE_SOURCE_DIR}/simba"
                     CMAKE_ARGS
+                        #                Bootstrapped Tools                #
                         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                        #                Bootstrapped Tools                #
-                        -DCMAKE_C_COMPILER=${EXTERNAL_INSTALL_DIR}/bin/cc
-                        -DCMAKE_CXX_COMPILER=${EXTERNAL_INSTALL_DIR}/bin/cxx
-                        -DCMAKE_AR=${EXTERNAL_INSTALL_DIR}/bin/ar
-                        -DCMAKE_RANLIB=${EXTERNAL_INSTALL_DIR}/bin/ranlib
-                        -DCMAKE_OBJCOPY=${EXTERNAL_INSTALL_DIR}/bin/objcopy
-                        -DCMAKE_RC_COMPILER=${EXTERNAL_INSTALL_DIR}/bin/rc
+                        -Dtarget=${target}
+                        -DEXTERNAL_INSTALL_DIR=${EXTERNAL_INSTALL_DIR}
+                        -DZIG_ARCH=${ZIG_ARCH}
+                        -DZIG_OS=${ZIG_OS}
+                        -DZIG_ABI=${ZIG_ABI}
+                        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_DIR}/zigtoolchain.cmake
                     DEPENDS ZigPassthrough)
