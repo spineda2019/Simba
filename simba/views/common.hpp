@@ -4,6 +4,7 @@
 #define SIMBA_VIEWS_COMMON_HPP_
 
 #include <type_traits>
+
 namespace simba::layout {
 
 template <int Value>
