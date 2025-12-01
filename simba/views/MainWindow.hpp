@@ -40,12 +40,12 @@ class MainWindow final {
                           FrameInfo<Width, Height>::Width::value,
                           FrameInfo<Width, Height>::Height::value,
                           "Balance: TODO"},
-          load_alternate_button_{ButtonInfo<Width, Height>::X::value,
-                                 ButtonInfo<Width, Height>::Y::value,
-                                 ButtonInfo<Width, Height>::Width::value,
-                                 ButtonInfo<Width, Height>::Height::value,
-                                 "Load Other Config"},
-          breakdown_button_{ButtonInfo<Width, Height>::X::value,
+          load_alternate_button_{
+              ButtonInfo<Width, Height>::template X<0, 0>::value,
+              ButtonInfo<Width, Height>::Y::value,
+              ButtonInfo<Width, Height>::Width::value,
+              ButtonInfo<Width, Height>::Height::value, "Load Other Config"},
+          breakdown_button_{ButtonInfo<Width, Height>::template X<1, 0>::value,
                             ButtonInfo<Width, Height>::Y::value,
                             ButtonInfo<Width, Height>::Width::value,
                             ButtonInfo<Width, Height>::Height::value,
@@ -81,6 +81,11 @@ class MainWindow final {
     };
 
     template <int ParentWidth, int ParentHeight>
+    struct GridLayout {
+        struct F {};
+    };
+
+    template <int ParentWidth, int ParentHeight>
     struct ButtonInfo {
         struct Width {
             inline static constexpr int value{ParentWidth / 4};
@@ -88,6 +93,7 @@ class MainWindow final {
         struct Height {
             inline static constexpr int value{ParentHeight / 10};
         };
+        template <int Row, int Column>
         struct X {
             inline static constexpr int value{
                 ((ParentWidth / 2) -
