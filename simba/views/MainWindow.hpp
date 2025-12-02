@@ -7,6 +7,8 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Window.H>
 
+#include "./common.hpp"
+
 namespace simba {
 
 class MainWindow final {
@@ -62,33 +64,13 @@ class MainWindow final {
         window_.end();
     }
 
-    template <int ParentWidth, int ParentHeight, int RowCount, int ColumnCount>
-    struct GridLayout {
-        struct CellWidth {
-            inline static constexpr int value{ParentWidth / ColumnCount};
-        };
-
-        struct CellHeight {
-            inline static constexpr int value{ParentHeight / RowCount};
-        };
-
-        template <int Cell>
-        struct XPosition {
-            static_assert(Cell < ColumnCount,
-                          "Requested Cell coordinate exceeds ColumnCount");
-            inline static constexpr int value{Cell * CellWidth::value};
-        };
-
-        template <int Cell>
-        struct YPosition {
-            static_assert(Cell < RowCount,
-                          "Requested Cell coordinate exceeds RowCount");
-            inline static constexpr int value{Cell * CellHeight::value};
-        };
-    };
+    inline static constexpr int column_count_{2};
+    inline static constexpr int row_count_{6};
 
     template <int ParentWidth, int ParentHeight>
     struct FrameInfo {
+        using ParentLayout =
+            GridLayout<ParentWidth, ParentHeight, row_count_, column_count_>;
         struct Width {
             inline static constexpr int value{ParentHeight / 2};
         };
@@ -103,9 +85,10 @@ class MainWindow final {
         };
     };
 
-    template <int ParentWidth, int ParentHeight, int RowCount = 3,
-              int ColumnCount = 2>
+    template <int ParentWidth, int ParentHeight>
     struct ButtonInfo {
+        using ParentLayout =
+            GridLayout<ParentWidth, ParentHeight, row_count_, column_count_>;
         struct Width {
             inline static constexpr int value{ParentWidth / 4};
         };
@@ -120,8 +103,7 @@ class MainWindow final {
                 (((ParentWidth / 2) -
                   ButtonInfo<ParentWidth, ParentHeight>::Width::value) /
                  2) +
-                GridLayout<ParentWidth, ParentHeight, RowCount,
-                           ColumnCount>::template XPosition<Column>::value};
+                ParentLayout::template XPosition<Column>::value};
         };
 
         template <int Row>
@@ -133,8 +115,7 @@ class MainWindow final {
                    (FrameInfo<ParentWidth, ParentHeight>::Y::value +
                     FrameInfo<ParentWidth, ParentHeight>::Height::value)) /
                   10)) +
-                GridLayout<ParentWidth, ParentHeight, RowCount,
-                           ColumnCount>::template YPosition<Row>::value};
+                ParentLayout::template YPosition<Row>::value};
         };
     };
 
