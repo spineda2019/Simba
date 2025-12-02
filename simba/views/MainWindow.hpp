@@ -35,8 +35,8 @@ class MainWindow final {
     template <int Width, int Height>
     explicit inline MainWindow(MainWindowSize<Width, Height>) noexcept
         : window_{0, 0, Width, Height, "Simba"},
-          grand_total_box{FrameInfo<Width, Height>::X::value,
-                          FrameInfo<Width, Height>::Y::value,
+          grand_total_box{FrameInfo<Width, Height>::template X<0>::value,
+                          FrameInfo<Width, Height>::template Y<0>::value,
                           FrameInfo<Width, Height>::Width::value,
                           FrameInfo<Width, Height>::Height::value,
                           "Balance: TODO"},
@@ -77,11 +77,19 @@ class MainWindow final {
         struct Height {
             inline static constexpr int value{ParentHeight / 5};
         };
+        template <int Column>
         struct X {
-            inline static constexpr int value{(ParentWidth - Width::value) / 2};
+            inline static constexpr int padding{(ParentWidth - Width::value) /
+                                                2};
+            inline static constexpr int value{
+                ParentLayout::template XPosition<Column>::value + padding};
         };
+        template <int Row>
         struct Y {
-            inline static constexpr int value{40};  // TODO(SEP): calculate
+            inline static constexpr int padding{ParentLayout::CellWidth::value /
+                                                8};
+            inline static constexpr int value{
+                ParentLayout::template YPosition<Row>::value + padding};
         };
     };
 
