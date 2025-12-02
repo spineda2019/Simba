@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 3.20)  # needed for C++23
 project(simba LANGUAGES CXX DESCRIPTION "The SimpleBudgetingApp")
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT result OUTPUT output)
+if(result)
+    # Enable LTO globally for Release builds
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
+
+    # And small builds
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL TRUE)
+else()
+    message(WARNING "LTO is not supported: ${output}")
+endif()
+
 include(FetchContent)  # For FLTK
 add_executable(simba main.cpp
                      MainWindow.cpp
@@ -18,7 +30,9 @@ FetchContent_Declare(
   SYSTEM         # Suppress warning lib authors caused
 )
 
-# 7. Make FLTK available. This downloads and adds it as a sub-project.
+set(FLTK_BUILD_FLUID OFF CACHE BOOL "Disable FLUID" FORCE)
+set(FLTK_BUILD_TEST OFF CACHE BOOL "Disable Tests" FORCE)
+set(FLTK_BUILD_EXAMPLES OFF CACHE BOOL "Disable Examples" FORCE)
 FetchContent_MakeAvailable(fltk)
 
 target_compile_options(simba PRIVATE -Wall
