@@ -104,6 +104,9 @@ class MainWindow final {
                   ButtonInfo<ParentWidth, ParentHeight>::Width::value) /
                  2) +
                 ParentLayout::template XPosition<Column>::value};
+
+            static_assert((value + Width::value) < ParentWidth,
+                          "X Position results in a button out of bounds");
         };
 
         template <int Row>
@@ -116,6 +119,9 @@ class MainWindow final {
                     FrameInfo<ParentWidth, ParentHeight>::Height::value)) /
                   10)) +
                 ParentLayout::template YPosition<Row>::value};
+
+            static_assert((value + Height::value) < ParentHeight,
+                          "Y Position results in a button out of bounds");
         };
     };
 
