@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)  # needed for C++23
 project(simba LANGUAGES CXX DESCRIPTION "The SimpleBudgetingApp")
 
+set(CMAKE_STRIP_RELEASE TRUE)
+set(CMAKE_STRIP_MINSIZEREL TRUE)
 include(CheckIPOSupported)
 check_ipo_supported(RESULT result OUTPUT output)
 if(result)

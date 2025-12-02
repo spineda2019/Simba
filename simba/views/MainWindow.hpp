@@ -107,6 +107,10 @@ class MainWindow final {
 
             static_assert((value + Width::value) < ParentWidth,
                           "X Position results in a button out of bounds");
+
+            static_assert(
+                padding < (ParentLayout::CellWidth::value - Width::value),
+                "Padding too large. Reduce and move element to next cell.");
         };
 
         template <int Row>
