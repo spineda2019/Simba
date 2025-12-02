@@ -23,6 +23,10 @@ class MainWindow final {
 
     void Show() noexcept;
 
+    void AddTransactionClicked();
+    void VisualizeClicked();
+    void AccountSummaryClicked();
+    void AccountEditorClicked();
     void LoadConfigClicked();
 
     ~MainWindow() = default;
@@ -70,11 +74,32 @@ class MainWindow final {
         grand_total_box.labelfont(FL_BOLD + FL_ITALIC);
         grand_total_box.labelsize(36);
 
-        constexpr auto button_callback = [](Fl_Widget*, void* self) {
-            static_cast<decltype(this)>(self)->LoadConfigClicked();
+        using Self = decltype(this);
+
+        constexpr auto add_transaction_callback = [](Fl_Widget*, void* self) {
+            static_cast<Self>(self)->AddTransactionClicked();
         };
-        load_alternate_button_.type(FL_NORMAL_BUTTON);
-        load_alternate_button_.callback(button_callback, this);
+        add_transaction_button_.callback(add_transaction_callback, this);
+
+        constexpr auto visualize_callback = [](Fl_Widget*, void* self) {
+            static_cast<Self>(self)->VisualizeClicked();
+        };
+        add_transaction_button_.callback(visualize_callback, this);
+
+        constexpr auto account_summary_callback = [](Fl_Widget*, void* self) {
+            static_cast<Self>(self)->AccountSummaryClicked();
+        };
+        add_transaction_button_.callback(account_summary_callback, this);
+
+        constexpr auto account_editor_callback = [](Fl_Widget*, void* self) {
+            static_cast<Self>(self)->AccountEditorClicked();
+        };
+        add_transaction_button_.callback(account_editor_callback, this);
+
+        constexpr auto load_alternate_callback = [](Fl_Widget*, void* self) {
+            static_cast<Self>(self)->LoadConfigClicked();
+        };
+        load_alternate_button_.callback(load_alternate_callback, this);
 
         window_.end();
     }

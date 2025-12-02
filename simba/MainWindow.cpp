@@ -10,6 +10,15 @@
 namespace simba {
 
 void MainWindow::Show() noexcept { window_.show(); }
+
+void MainWindow::AddTransactionClicked() {}
+
+void MainWindow::VisualizeClicked() {}
+
+void MainWindow::AccountSummaryClicked() {}
+
+void MainWindow::AccountEditorClicked() {}
+
 void MainWindow::LoadConfigClicked() { fs::GetConfigFile(); }
 
 }  // namespace simba
