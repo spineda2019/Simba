@@ -42,11 +42,11 @@ class MainWindow final {
                           "Balance: TODO"},
           load_alternate_button_{
               ButtonInfo<Width, Height>::template X<0>::value,
-              ButtonInfo<Width, Height>::template Y<0>::value,
+              ButtonInfo<Width, Height>::template Y<2>::value,
               ButtonInfo<Width, Height>::Width::value,
               ButtonInfo<Width, Height>::Height::value, "Load Other Config"},
           breakdown_button_{ButtonInfo<Width, Height>::template X<1>::value,
-                            ButtonInfo<Width, Height>::template Y<0>::value,
+                            ButtonInfo<Width, Height>::template Y<3>::value,
                             ButtonInfo<Width, Height>::Width::value,
                             ButtonInfo<Width, Height>::Height::value,
                             "Load Other Config"} {
@@ -89,6 +89,7 @@ class MainWindow final {
     struct ButtonInfo {
         using ParentLayout =
             GridLayout<ParentWidth, ParentHeight, row_count_, column_count_>;
+
         struct Width {
             inline static constexpr int value{ParentWidth / 4};
         };
@@ -99,11 +100,10 @@ class MainWindow final {
 
         template <int Column>
         struct X {
+            inline static constexpr int padding{ParentLayout::CellWidth::value /
+                                                4};
             inline static constexpr int value{
-                (((ParentWidth / 2) -
-                  ButtonInfo<ParentWidth, ParentHeight>::Width::value) /
-                 2) +
-                ParentLayout::template XPosition<Column>::value};
+                ParentLayout::template XPosition<Column>::value + padding};
 
             static_assert((value + Width::value) < ParentWidth,
                           "X Position results in a button out of bounds");
@@ -112,12 +112,6 @@ class MainWindow final {
         template <int Row>
         struct Y {
             inline static constexpr int value{
-                (FrameInfo<ParentWidth, ParentHeight>::Y::value +
-                 FrameInfo<ParentWidth, ParentHeight>::Height::value +
-                 ((ParentHeight -
-                   (FrameInfo<ParentWidth, ParentHeight>::Y::value +
-                    FrameInfo<ParentWidth, ParentHeight>::Height::value)) /
-                  10)) +
                 ParentLayout::template YPosition<Row>::value};
 
             static_assert((value + Height::value) < ParentHeight,
