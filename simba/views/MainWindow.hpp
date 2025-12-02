@@ -40,16 +40,31 @@ class MainWindow final {
                           FrameInfo<Width, Height>::Width::value,
                           FrameInfo<Width, Height>::Height::value,
                           "Balance: TODO"},
-          load_alternate_button_{
+          add_transaction_button_{
               ButtonInfo<Width, Height>::template X<0>::value,
               ButtonInfo<Width, Height>::template Y<2>::value,
               ButtonInfo<Width, Height>::Width::value,
-              ButtonInfo<Width, Height>::Height::value, "Load Other Config"},
-          breakdown_button_{ButtonInfo<Width, Height>::template X<1>::value,
-                            ButtonInfo<Width, Height>::template Y<3>::value,
+              ButtonInfo<Width, Height>::Height::value, "Add Transaction"},
+          visualize_button_{ButtonInfo<Width, Height>::template X<1>::value,
+                            ButtonInfo<Width, Height>::template Y<2>::value,
                             ButtonInfo<Width, Height>::Width::value,
                             ButtonInfo<Width, Height>::Height::value,
-                            "Load Other Config"} {
+                            "Visualize"},
+          account_summary_button_{
+              ButtonInfo<Width, Height>::template X<0>::value,
+              ButtonInfo<Width, Height>::template Y<3>::value,
+              ButtonInfo<Width, Height>::Width::value,
+              ButtonInfo<Width, Height>::Height::value, "Account Summary"},
+          account_editor_button_{
+              ButtonInfo<Width, Height>::template X<1>::value,
+              ButtonInfo<Width, Height>::template Y<3>::value,
+              ButtonInfo<Width, Height>::Width::value,
+              ButtonInfo<Width, Height>::Height::value, "Account Editor"},
+          load_alternate_button_{
+              ButtonInfo<Width, Height>::template X<0>::value,
+              ButtonInfo<Width, Height>::template Y<4>::value,
+              ButtonInfo<Width, Height>::Width::value,
+              ButtonInfo<Width, Height>::Height::value, "Load Other Config"} {
         //
         grand_total_box.box(FL_UP_BOX);
         grand_total_box.labelfont(FL_BOLD + FL_ITALIC);
@@ -134,8 +149,11 @@ class MainWindow final {
  private:
     Fl_Window window_;
     Fl_Box grand_total_box;
+    Fl_Button add_transaction_button_;
+    Fl_Button visualize_button_;
+    Fl_Button account_summary_button_;
+    Fl_Button account_editor_button_;
     Fl_Button load_alternate_button_;
-    Fl_Button breakdown_button_;
 };
 }  // namespace simba
 
