@@ -1,5 +1,0 @@
-[unstable]
-bindeps = true
-
-[alias]
-bootstrap = "run -p bootstrap --"
