@@ -2,7 +2,8 @@ set(CPP_FILES
     "src/main.cpp"
     "src/mainwindow.cpp")
 set(UI_FILES
-    "ui/mainwindow.ui")
+    "ui/mainwindow.ui"
+    "ui/license.ui")
 set(MOC_HEADERS
     "src/moc_include/mainwindow.hpp")
 
