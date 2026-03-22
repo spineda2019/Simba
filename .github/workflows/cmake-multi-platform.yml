@@ -1,0 +1,101 @@
+# CMake project on multiple platforms.
+# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
+#
+# CMake build types: Debug; Release (ReleaseFast); MinSizeRel (ReleaseSmall).
+name: CMake on multiple platforms
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build-${{ github.run_id }}-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        build_type: [Debug, Release, MinSizeRel]
+        platform: [ubuntu-gcc, ubuntu-clang, windows-x64, windows-arm64, macos]
+        include:
+          - platform: ubuntu-gcc
+            os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+          - platform: ubuntu-clang
+            os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+          - platform: windows-x64
+            os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+            cmake_platform: x64
+            qt_arch: win64_msvc2022_64
+          - platform: windows-arm64
+            os: windows-11-arm
+            c_compiler: cl
+            cpp_compiler: cl
+            cmake_platform: ARM64
+            qt_arch: win64_msvc2022_arm64
+          - platform: macos
+            os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Qt
+      if: runner.os == 'Windows'
+      uses: jurplel/install-qt-action@v4
+      with:
+        arch: ${{ matrix.qt_arch }}
+
+    - name: Install Qt
+      if: runner.os != 'Windows'
+      uses: jurplel/install-qt-action@v4
+
+    - name: Configure CMake
+      run: |
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          cmake -B "$BUILD_DIR" \
+            -G "Visual Studio 17 2022" \
+            -A "${{ matrix.cmake_platform }}" \
+            -S "${{ github.workspace }}"
+        else
+          cmake -B "$BUILD_DIR" \
+            -DCMAKE_CXX_COMPILER="${{ matrix.cpp_compiler }}" \
+            -DCMAKE_C_COMPILER="${{ matrix.c_compiler }}" \
+            -DCMAKE_BUILD_TYPE="${{ matrix.build_type }}" \
+            -S "${{ github.workspace }}"
+        fi
+
+    - name: Build
+      run: cmake --build "$BUILD_DIR" --config "${{ matrix.build_type }}"
+
+    - name: Test
+      run: cd "$BUILD_DIR" && ctest --build-config "${{ matrix.build_type }}"
+
+    - name: Install to staging
+      run: |
+        STAGING="${RUNNER_TEMP}/simba-install"
+        cmake --install "$BUILD_DIR" --config "${{ matrix.build_type }}" --prefix "$STAGING"
+
+    - name: Upload install tree
+      if: matrix.build_type != 'Debug'
+      uses: actions/upload-artifact@v4
+      with:
+        name: simba-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}-${{ github.run_id }}
+        path: ${{ runner.temp }}/simba-install
+        if-no-files-found: error
