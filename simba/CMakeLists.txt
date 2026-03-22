@@ -1,11 +1,15 @@
 set(CPP_FILES
     "src/main.cpp"
-    "src/mainwindow.cpp")
+    "src/mainwindow.cpp"
+    "src/LicenseInfo.cpp"
+)
 set(UI_FILES
     "ui/mainwindow.ui"
     "ui/license.ui")
 set(MOC_HEADERS
-    "src/moc_include/mainwindow.hpp")
+    "src/moc_include/mainwindow.hpp"
+    "src/moc_include/LicenseInfo.hpp"
+)
 
 qt_standard_project_setup()
 qt_add_executable(simba ${MOC_HEADERS} ${CPP_FILES})

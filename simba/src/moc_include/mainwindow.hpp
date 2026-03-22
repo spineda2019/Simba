@@ -19,6 +19,9 @@ class MainWindow final : public QMainWindow {
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
+ private slots:
+    void OnLicenseInfoTriggered();
+
  private:
     Ui::MainWindow* ui_;
 };
