@@ -32,3 +32,7 @@ set_target_properties(simba PROPERTIES
                       WIN32_EXECUTABLE ON  # prevents console window on windows
                       MACOSX_BUNDLE ON     # Creates a full AppBundle on OSX
 )
+
+install(TARGETS simba
+        BUNDLE DESTINATION .
+        RUNTIME DESTINATION bin)
