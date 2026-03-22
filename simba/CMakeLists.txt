@@ -15,12 +15,20 @@ qt_standard_project_setup()
 qt_add_executable(simba ${MOC_HEADERS} ${CPP_FILES})
 qt_add_ui(simba SOURCES ${UI_FILES})
 
-target_compile_options(simba PUBLIC -Wall
-                                    -Wextra
-                                    -Wpedantic
-                                    -Wshadow
-                                    -Wconversion
-                                    -Werror)
+if(MSVC)
+    target_compile_options(simba PRIVATE
+        /W4
+        /WX
+        /permissive-
+    )
+else()
+    target_compile_options(simba PRIVATE -Wall
+                                        -Wextra
+                                        -Wpedantic
+                                        -Wshadow
+                                        -Wconversion
+                                        -Werror)
+endif()
 
 target_compile_features(simba PUBLIC cxx_std_23)
 target_link_libraries(simba PRIVATE
