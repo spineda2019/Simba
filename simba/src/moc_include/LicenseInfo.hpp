@@ -18,7 +18,12 @@ class LicenseInfo final : public QDialog {
 
  public:
     explicit LicenseInfo(QWidget* parent = nullptr);
+
     ~LicenseInfo();
+    LicenseInfo(const LicenseInfo&) = delete;
+    LicenseInfo(LicenseInfo&&) = delete;
+    LicenseInfo& operator=(const LicenseInfo&) = delete;
+    LicenseInfo& operator=(LicenseInfo&&) = delete;
 
  private:
     Ui::LicenseInfo* ui_;
