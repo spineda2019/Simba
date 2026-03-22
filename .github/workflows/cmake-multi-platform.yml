@@ -1,5 +1,7 @@
 # CMake project on multiple platforms.
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
+#
+# CMake build types: Debug; Release (ReleaseFast); MinSizeRel (ReleaseSmall).
 name: CMake on multiple platforms
 
 on:
@@ -23,31 +25,33 @@ jobs:
       fail-fast: false
 
       matrix:
+        build_type: [Debug, Release, MinSizeRel]
+        platform: [ubuntu-gcc, ubuntu-clang, windows-x64, windows-arm64, macos]
         include:
-          - os: ubuntu-latest
+          - platform: ubuntu-gcc
+            os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-            build_type: Debug
-          - os: ubuntu-latest
+          - platform: ubuntu-clang
+            os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-            build_type: Debug
-          - os: windows-latest
+          - platform: windows-x64
+            os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
-            build_type: Debug
             cmake_platform: x64
             qt_arch: win64_msvc2022_64
-          - os: windows-11-arm
+          - platform: windows-arm64
+            os: windows-11-arm
             c_compiler: cl
             cpp_compiler: cl
-            build_type: Debug
             cmake_platform: ARM64
             qt_arch: win64_msvc2022_arm64
-          - os: macos-latest
+          - platform: macos
+            os: macos-latest
             c_compiler: clang
             cpp_compiler: clang++
-            build_type: Debug
 
     steps:
     - uses: actions/checkout@v4
@@ -89,6 +93,7 @@ jobs:
         cmake --install "$BUILD_DIR" --config "${{ matrix.build_type }}" --prefix "$STAGING"
 
     - name: Upload install tree
+      if: matrix.build_type != 'Debug'
       uses: actions/upload-artifact@v4
       with:
         name: simba-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}-${{ github.run_id }}
