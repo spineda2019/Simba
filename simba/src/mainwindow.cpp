@@ -6,10 +6,14 @@
 #include <qmainwindow.h>
 #include <qmessagebox.h>
 #include <qobject.h>
+#include <qpushbutton.h>
 #include <qurl.h>
 #include <qwidget.h>
 #include <ui_mainwindow.h>
 
+#include <array>
+
+#include "include/style.hpp"
 #include "moc_include/LicenseInfo.hpp"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -23,6 +27,16 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::OnCreateBudget);
     connect(this->ui_->action_see_the_source_code, &QAction::triggered, this,
             &MainWindow::OnShowSourceCode);
+
+    const std::array<QPushButton*, 3> buttons{
+        ui_->button_add_transaction,
+        ui_->button_add_category,
+        ui_->button_show_summary,
+    };
+
+    for (QPushButton* button : buttons) {
+        button->setStyleSheet(simba::style::sheets::button);
+    }
 }
 
 MainWindow::~MainWindow() { delete ui_; }
@@ -38,16 +52,12 @@ void MainWindow::OnOpenBudget() {
 
     const QString to_open{
         QFileDialog::getOpenFileName(this, tr(caption), {}, tr(filter))};
-    // TODO(SEP): implement
-    {
-        QMessageBox debug{this};
-        if (to_open.isEmpty()) {
-            debug.setText("No file picked...");
-
-        } else {
-            debug.setText(to_open);
-        }
-        (void)debug.exec();
+    if (to_open.isEmpty()) {
+        (void)QMessageBox::warning(this, tr("Simba"),
+                                   tr("No file selected. Budget not loaded"));
+    } else {
+        // TODO(SEP): implement JSON parsing
+        (void)QMessageBox::information(this, tr("Simba"), tr("TODO"));
     }
 }
 
