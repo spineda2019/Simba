@@ -13,7 +13,28 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="button_add_transaction">
+        <property name="text">
+         <string>Add Transaction</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="button_add_category">
+        <property name="text">
+         <string>Add Category</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -27,25 +48,26 @@
     <property name="title">
      <string>About...</string>
     </property>
-    <addaction name="actionSee_the_source_code"/>
-    <addaction name="actionLicense_info"/>
+    <addaction name="action_see_the_source_code"/>
+    <addaction name="action_license_info"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
+    <addaction name="action_open_budget"/>
+    <addaction name="action_create_budget"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAbout"/>
   </widget>
-  <action name="actionSee_the_source_code">
+  <action name="action_see_the_source_code">
    <property name="text">
     <string>See the source code!</string>
    </property>
   </action>
-  <action name="actionLicense_info">
+  <action name="action_license_info">
    <property name="text">
     <string>License info</string>
    </property>
@@ -53,9 +75,14 @@
     <string>See the full license text for simba</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="action_open_budget">
    <property name="text">
     <string>Open Budget...</string>
+   </property>
+  </action>
+  <action name="action_create_budget">
+   <property name="text">
+    <string>Create Budget...</string>
    </property>
   </action>
  </widget>

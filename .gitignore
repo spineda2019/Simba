@@ -3,6 +3,7 @@ zig-out/
 .cache/
 build/
 compile_commands.json
+CMakeUserPresets.json
 
 
 # Added by cargo

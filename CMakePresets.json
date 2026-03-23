@@ -1,0 +1,74 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Debug",
+      "description": "Debug (CMAKE_BUILD_TYPE=Debug). Use release-fast / release-small for optimized builds.",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "fast",
+      "inherits": "base",
+      "displayName": "ReleaseFast",
+      "description": "Speed-optimized release (CMAKE_BUILD_TYPE=Release).",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "small",
+      "inherits": "base",
+      "displayName": "ReleaseSmall",
+      "description": "Size-optimized release (CMAKE_BUILD_TYPE=MinSizeRel).",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "fast",
+      "configurePreset": "fast"
+    },
+    {
+      "name": "small",
+      "configurePreset": "small"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "fast",
+      "configurePreset": "fast"
+    },
+    {
+      "name": "small",
+      "configurePreset": "small"
+    }
+  ]
+}

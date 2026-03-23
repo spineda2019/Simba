@@ -26,6 +26,9 @@ class MainWindow final : public QMainWindow {
 
  private slots:
     void OnLicenseInfoTriggered();
+    void OnOpenBudget();
+    void OnCreateBudget();
+    void OnShowSourceCode() const;
 
  private:
     Ui::MainWindow* ui_;
