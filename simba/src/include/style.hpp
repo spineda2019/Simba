@@ -35,7 +35,7 @@ QPushButton:focus {
 )";
 }  // namespace detail
 
-static const QString button{detail::modern_button_style};
+inline const QString button{detail::modern_button_style};
 
 }  // namespace simba::style::sheets
 
