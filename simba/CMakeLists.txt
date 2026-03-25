@@ -4,8 +4,8 @@ set(CPP_FILES
     "src/LicenseInfo.cpp"
 )
 set(UI_FILES
-    "ui/MainWindow.ui"
-    "ui/license.ui")
+    "src/ui/MainWindow.ui"
+    "src/ui/license.ui")
 set(MOC_HEADERS
     "src/moc_include/MainWindow.hpp"
     "src/moc_include/LicenseInfo.hpp"
