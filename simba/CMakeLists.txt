@@ -23,11 +23,11 @@ if(MSVC)
     )
 else()
     target_compile_options(simba PRIVATE -Wall
-                                        -Wextra
-                                        -Wpedantic
-                                        -Wshadow
-                                        -Wconversion
-                                        -Werror)
+                                         -Wextra
+                                         -Wpedantic
+                                         -Wshadow
+                                         -Wconversion
+                                         -Werror)
 endif()
 
 target_compile_features(simba PUBLIC cxx_std_23)
@@ -35,6 +35,10 @@ target_link_libraries(simba PRIVATE
                                     Qt6::Core
                                     Qt6::Gui
                                     Qt6::Widgets)
+target_link_libraries(simba PRIVATE nlohmann_json::nlohmann_json)
+
+target_compile_definitions(simba PRIVATE JSON_USE_IMPLICIT_CONVERSIONS=0)
+
 
 set_target_properties(simba PROPERTIES
                       WIN32_EXECUTABLE ON  # prevents console window on windows

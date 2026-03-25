@@ -1,5 +1,6 @@
 # Project settings
 cmake_minimum_required( VERSION 3.15 )
+include(FetchContent)
 
 project(simba
         VERSION 1.0
@@ -18,5 +19,11 @@ if(NOT Qt6_FOUND)
 else()
     message(STATUS "Qt 6.4.2 found in the system.")
 endif()
+
+FetchContent_Declare(json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0
+)
+FetchContent_MakeAvailable(json)
 
 add_subdirectory(simba)
