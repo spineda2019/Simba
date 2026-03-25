@@ -1,4 +1,5 @@
-#include "moc_include/mainwindow.hpp"
+
+#include "moc_include/MainWindow.hpp"
 
 #include <qaction.h>
 #include <qdesktopservices.h>
@@ -9,7 +10,7 @@
 #include <qpushbutton.h>
 #include <qurl.h>
 #include <qwidget.h>
-#include <ui_mainwindow.h>
+#include <ui_MainWindow.h>
 
 #include <array>
 
