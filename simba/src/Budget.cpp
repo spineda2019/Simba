@@ -4,6 +4,8 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+#include "nlohmann/json_fwd.hpp"
+
 namespace simba {
 
 Budget::Budget() noexcept : cents_{0} {}
@@ -16,8 +18,23 @@ void Budget::ToJson(nlohmann::json& json) const {
 void Budget::AddTransaction() {}
 
 Budget Budget::FromFile(const std::string& path) {
-    std::ifstream file{path};
-    return {};
+    try {
+        std::ifstream file{path};
+        nlohmann::json j{};
+        file >> j;
+        return j.get<Budget>();
+    } catch (...) {
+        return {};
+    }
+}
+
+void Budget::SaveToFile(const std::string& path) {
+    try {
+        std::ofstream file{path};
+        const nlohmann::json j{*this};
+        file << j;
+    } catch (...) {
+    }
 }
 
 void to_json(nlohmann::json& j, const Budget& b) { b.ToJson(j); }

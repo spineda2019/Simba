@@ -15,6 +15,7 @@ class Budget final {
 
  public:
     static Budget FromFile(const std::string& path);
+    void SaveToFile(const std::string& path);
 
  private:
     std::size_t cents_{};

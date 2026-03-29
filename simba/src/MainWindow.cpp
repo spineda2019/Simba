@@ -20,7 +20,10 @@
 #include "moc_include/LicenseInfo.hpp"
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow{parent}, ui_{new Ui::MainWindow}, open_budget_{nullptr} {
+    : QMainWindow{parent},
+      ui_{new Ui::MainWindow},
+      current_budget_path_{},
+      open_budget_{nullptr} {
     ui_->setupUi(this);
     connect(this->ui_->action_license_info, &QAction::triggered, this,
             &MainWindow::OnLicenseInfoTriggered);
@@ -73,18 +76,18 @@ void MainWindow::OnCreateBudget() {
         QFileDialog::getSaveFileName(this, tr(caption), {}, tr(filter))};
 
     // TODO(SEP): implement
-    {
-        QMessageBox debug{this};
-        if (to_create.isEmpty()) {
-            debug.setText("No file picked...");
+    if (to_create.isEmpty()) {
+        (void)QMessageBox::warning(this, tr("Simba"),
+                                   tr("No file selected. Budget not created"));
 
-        } else {
-            debug.setText(to_create);
-            simba::Budget deserialized{
-                simba::Budget::FromFile(to_create.toStdString())};
-            (void)deserialized;
+    } else {
+        // TODO(SEP): reuse memory perhaps?
+        if (open_budget_) {
+            open_budget_->SaveToFile(current_budget_path_.toStdString());
+            delete open_budget_;
         }
-        (void)debug.exec();
+        current_budget_path_ = to_create;
+        open_budget_ = new simba::Budget;
     }
 }
 

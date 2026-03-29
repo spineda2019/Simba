@@ -2,6 +2,7 @@
 #define SIMBA_SRC_MOC_INCLUDE_MAINWINDOW
 
 #include <qmainwindow.h>
+#include <qt6/QtCore/qobject.h>
 #include <qtconfigmacros.h>
 #include <qtmetamacros.h>
 #include <qwidget.h>
@@ -36,6 +37,7 @@ class MainWindow final : public QMainWindow {
 
  private:
     Ui::MainWindow* ui_;
+    QString current_budget_path_{};
     simba::Budget* open_budget_{nullptr};
 };
 
