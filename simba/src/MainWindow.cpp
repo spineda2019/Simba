@@ -88,6 +88,7 @@ void MainWindow::OnCreateBudget() {
         }
         current_budget_path_ = to_create;
         open_budget_ = new simba::Budget;
+        open_budget_->SaveToFile(current_budget_path_.toStdString());
     }
 }
 
