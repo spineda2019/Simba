@@ -55,3 +55,16 @@ qt_generate_deploy_app_script(
     OUTPUT_SCRIPT deploy_script
 )
 install(SCRIPT ${deploy_script})
+
+if(CMAKE_EXPORT_COMPILE_COMMANDS)
+    set(_simba_compile_commands_src "${CMAKE_BINARY_DIR}/compile_commands.json")
+    set(_simba_compile_commands_dst "${CMAKE_SOURCE_DIR}/compile_commands.json")
+
+    add_custom_target(simba_copy_compile_commands_to_repo_root ALL
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "${_simba_compile_commands_src}"
+                "${_simba_compile_commands_dst}"
+        BYPRODUCTS "${_simba_compile_commands_dst}"
+        VERBATIM
+    )
+endif()

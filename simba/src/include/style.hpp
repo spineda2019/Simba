@@ -5,8 +5,9 @@
 #include <qstyle.h>
 
 namespace simba::style::sheets {
-namespace detail {
-inline constexpr const char* modern_button_style = R"(
+using namespace Qt::StringLiterals;
+const inline QString button =
+    uR"(
 QPushButton {
     background-color: #2D9CDB;
     color: #FFFFFF;
@@ -32,10 +33,7 @@ QPushButton:disabled {
 QPushButton:focus {
     outline: none;
 }
-)";
-}  // namespace detail
-
-inline const QString button{detail::modern_button_style};
+)"_s;
 
 }  // namespace simba::style::sheets
 
