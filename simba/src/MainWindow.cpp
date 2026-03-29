@@ -15,6 +15,7 @@
 #include <array>
 #include <string>
 
+#include "include/Budget.hpp"
 #include "include/style.hpp"
 #include "moc_include/LicenseInfo.hpp"
 
@@ -79,6 +80,9 @@ void MainWindow::OnCreateBudget() {
 
         } else {
             debug.setText(to_create);
+            simba::Budget deserialized{
+                simba::Budget::FromFile(to_create.toStdString())};
+            (void)deserialized;
         }
         (void)debug.exec();
     }

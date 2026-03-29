@@ -15,8 +15,7 @@ void Budget::ToJson(nlohmann::json& json) const {
 }
 void Budget::AddTransaction() {}
 
-[[maybe_unused]]
-static Budget FromFile(const std::string& path) {
+Budget Budget::FromFile(const std::string& path) {
     std::ifstream file{path};
     return {};
 }
