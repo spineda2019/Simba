@@ -6,6 +6,10 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+#include <Budget.hpp>
+
+#include "Budget.hpp"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -32,6 +36,7 @@ class MainWindow final : public QMainWindow {
 
  private:
     Ui::MainWindow* ui_;
+    simba::Budget* open_budget_{nullptr};
 };
 
 #endif  // SIMBA_SRC_MOC_INCLUDE_MAINWINDOW

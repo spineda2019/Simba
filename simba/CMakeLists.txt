@@ -2,6 +2,7 @@ set(CPP_FILES
     "src/main.cpp"
     "src/MainWindow.cpp"
     "src/LicenseInfo.cpp"
+    "src/Budget.cpp"
 )
 set(UI_FILES
     "src/ui/MainWindow.ui"
@@ -14,6 +15,7 @@ set(MOC_HEADERS
 qt_standard_project_setup()
 qt_add_executable(simba ${MOC_HEADERS} ${CPP_FILES})
 qt_add_ui(simba SOURCES ${UI_FILES})
+target_include_directories(simba PRIVATE src/include)
 
 if(MSVC)
     target_compile_options(simba PRIVATE
@@ -31,8 +33,7 @@ else()
 endif()
 
 target_compile_features(simba PUBLIC cxx_std_23)
-target_link_libraries(simba PRIVATE
-                                    Qt6::Core
+target_link_libraries(simba PRIVATE Qt6::Core
                                     Qt6::Gui
                                     Qt6::Widgets)
 target_link_libraries(simba PRIVATE nlohmann_json::nlohmann_json)
@@ -48,3 +49,9 @@ set_target_properties(simba PROPERTIES
 install(TARGETS simba
         BUNDLE DESTINATION .
         RUNTIME DESTINATION bin)
+
+qt_generate_deploy_app_script(
+    TARGET simba
+    OUTPUT_SCRIPT deploy_script
+)
+install(SCRIPT ${deploy_script})

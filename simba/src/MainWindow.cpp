@@ -13,12 +13,13 @@
 #include <ui_MainWindow.h>
 
 #include <array>
+#include <string>
 
 #include "include/style.hpp"
 #include "moc_include/LicenseInfo.hpp"
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow{parent}, ui_{new Ui::MainWindow} {
+    : QMainWindow{parent}, ui_{new Ui::MainWindow}, open_budget_{nullptr} {
     ui_->setupUi(this);
     connect(this->ui_->action_license_info, &QAction::triggered, this,
             &MainWindow::OnLicenseInfoTriggered);
@@ -59,6 +60,7 @@ void MainWindow::OnOpenBudget() {
     } else {
         // TODO(SEP): implement JSON parsing
         (void)QMessageBox::information(this, tr("Simba"), tr("TODO"));
+        const std::string path{to_open.toStdString()};
     }
 }
 
