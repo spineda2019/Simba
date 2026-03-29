@@ -1,6 +1,6 @@
 #include <qapplication.h>
 
-#include "moc_include/mainwindow.hpp"
+#include "moc_include/MainWindow.hpp"
 
 int main(int argc, char** argv) {
     QApplication app{argc, argv};
