@@ -14,37 +14,40 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="spacing">
-       <number>24</number>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QPushButton" name="button_add_transaction">
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="button_add_category">
-        <property name="text">
-         <string>Add Category</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="button_add_transaction">
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Add Transaction</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="button_show_summary">
-        <property name="text">
-         <string>Show Summary</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      <property name="text">
+       <string>Add Transaction</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="button_add_category">
+      <property name="text">
+       <string>Add Category</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QPushButton" name="button_show_summary">
+      <property name="text">
+       <string>Show Summary</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
+     <widget class="QLabel" name="grand_total_label">
+      <property name="text">
+       <string>Grand Total: </string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
