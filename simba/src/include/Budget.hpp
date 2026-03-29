@@ -1,9 +1,12 @@
 #ifndef SIMBA_SRC_INCLUDE_BUDGET_HPP_
 #define SIMBA_SRC_INCLUDE_BUDGET_HPP_
 
+#include <chrono>
 #include <cstddef>
 #include <nlohmann/json.hpp>
 #include <string>
+
+#include "meta.hpp"
 
 namespace simba {
 class Budget final {
@@ -12,6 +15,14 @@ class Budget final {
     Budget(const nlohmann::json& json);
     void AddTransaction();
     void ToJson(nlohmann::json&) const;
+
+ public:
+    struct Transaction final {
+        std::chrono::year_month_day date;
+        std::chrono::hh_mm_ss<std::chrono::seconds> time;
+
+        meta::signed_native_word_t amount;
+    };
 
  public:
     static Budget FromFile(const std::string& path);

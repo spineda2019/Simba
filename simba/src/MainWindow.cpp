@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget* parent)
         ui_->button_show_summary,
     };
 
-    for (QPushButton* button : buttons) {
+    for (QPushButton* const button : buttons) {
         button->setStyleSheet(simba::style::sheets::button);
     }
 }
