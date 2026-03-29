@@ -2,10 +2,11 @@
 #define SIMBA_SRC_INCLUDE_STYLE_HPP_
 
 #include <qobject.h>
+#include <qstring.h>
 #include <qstyle.h>
 
 namespace simba::style::sheets {
-using namespace Qt::StringLiterals;
+using Qt::Literals::StringLiterals::operator""_s;
 const inline QString button =
     uR"(
 QPushButton {
