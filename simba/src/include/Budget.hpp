@@ -28,6 +28,7 @@ class Budget final {
 
         void ToJson(nlohmann::json&) const;
         Transaction(const nlohmann::json&);
+        Transaction() noexcept;
     };
 
  public:

@@ -14,7 +14,9 @@ Budget::Budget() noexcept : cents_{0}, transaction_history_{} {}
 
 Budget::Budget(const nlohmann::json& json)
     : cents_{json.at("cents")},
-      transaction_history_{json.at("transaction_history")} {}
+      transaction_history_(
+          json.at("transaction_history")
+              .get<std::vector<Transaction>>()) {}
 
 void Budget::ToJson(nlohmann::json& json) const {
     json = {
@@ -39,11 +41,13 @@ Budget Budget::FromFile(const std::string& path) {
 void Budget::SaveToFile(const std::string& path) {
     try {
         std::ofstream file{path};
-        const nlohmann::json j{*this};
+        const nlohmann::json j(*this);
         file << j;
     } catch (...) {
     }
 }
+
+Budget::Transaction::Transaction() noexcept : date{}, time{}, amount{} {}
 
 Budget::Transaction::Transaction(const nlohmann::json& json)
     : date{}, time{}, amount{json.at("amount")} {
@@ -54,7 +58,7 @@ Budget::Transaction::Transaction(const nlohmann::json& json)
     std::istringstream time_stream{time_string};
     std::chrono::seconds aux{};
 
-    std::chrono::from_stream(date_stream, "%D", date);
+    std::chrono::from_stream(date_stream, "%F", date);
     std::chrono::from_stream(time_stream, "%T", aux);
 
     time = std::chrono::hh_mm_ss<decltype(aux)>{aux};
