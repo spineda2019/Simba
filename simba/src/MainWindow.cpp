@@ -124,7 +124,11 @@ void MainWindow::OnCreateBudget() {
     }
 }
 
-void MainWindow::OnShowSourceCode() const {
+void MainWindow::OnShowSourceCode() {
     const static QUrl url{"https://github.com/spineda2019/Simba"};
     QDesktopServices::openUrl(url);
+
+    (void)QMessageBox::information(this, tr("Simba"),
+                                   tr("The source repository site has been "
+                                      "opened in your default web browser."));
 };

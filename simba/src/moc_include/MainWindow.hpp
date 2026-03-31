@@ -39,7 +39,7 @@ class MainWindow final : public QMainWindow {
     void OnLicenseInfoTriggered();
     void OnOpenBudget();
     void OnCreateBudget();
-    void OnShowSourceCode() const;
+    void OnShowSourceCode();
 
  private:
     QString current_budget_path_{};
