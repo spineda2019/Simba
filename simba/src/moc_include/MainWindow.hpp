@@ -2,12 +2,14 @@
 #define SIMBA_SRC_MOC_INCLUDE_MAINWINDOW
 
 #include <qmainwindow.h>
+#include <qpushbutton.h>
 #include <qt6/QtCore/qobject.h>
 #include <qtconfigmacros.h>
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
 #include <Budget.hpp>
+#include <array>
 
 #include "Budget.hpp"
 
@@ -29,6 +31,10 @@ class MainWindow final : public QMainWindow {
     MainWindow& operator=(const MainWindow&) = delete;
     MainWindow& operator=(MainWindow&&) = delete;
 
+ private:
+    void EnableOverview();
+    void DisableOverview();
+
  private slots:
     void OnLicenseInfoTriggered();
     void OnOpenBudget();
@@ -36,8 +42,8 @@ class MainWindow final : public QMainWindow {
     void OnShowSourceCode() const;
 
  private:
-    Ui::MainWindow* ui_;
     QString current_budget_path_{};
+    Ui::MainWindow* ui_;
     simba::Budget* open_budget_{nullptr};
 };
 

@@ -21,8 +21,8 @@
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow{parent},
-      ui_{new Ui::MainWindow},
       current_budget_path_{},
+      ui_{new Ui::MainWindow},
       open_budget_{nullptr} {
     ui_->setupUi(this);
     connect(this->ui_->action_license_info, &QAction::triggered, this,
@@ -34,15 +34,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(this->ui_->action_see_the_source_code, &QAction::triggered, this,
             &MainWindow::OnShowSourceCode);
 
-    const std::array<QPushButton*, 3> buttons{
-        ui_->button_add_transaction,
-        ui_->button_add_category,
-        ui_->button_show_summary,
-    };
-
-    for (QPushButton* const button : buttons) {
-        button->setStyleSheet(simba::style::sheets::button);
-    }
+    this->DisableOverview();
 }
 
 MainWindow::~MainWindow() { delete ui_; }
@@ -65,6 +57,39 @@ void MainWindow::OnOpenBudget() {
         // TODO(SEP): implement JSON parsing
         (void)QMessageBox::information(this, tr("Simba"), tr("TODO"));
         const std::string path{to_open.toStdString()};
+        this->EnableOverview();
+    }
+}
+
+void MainWindow::EnableOverview() {
+    static const std::array<QPushButton*, 3> overview_buttons{
+        ui_->button_add_transaction,
+        ui_->button_add_category,
+        ui_->button_show_summary,
+    };
+
+    ui_->grand_total_label->setStyleSheet(
+        simba::style::sheets::labels::grand_total);
+
+    for (QPushButton* const button : overview_buttons) {
+        button->setStyleSheet(simba::style::sheets::buttons::overview_enabled);
+        button->setDisabled(false);
+    }
+}
+
+void MainWindow::DisableOverview() {
+    static const std::array<QPushButton*, 3> overview_buttons{
+        ui_->button_add_transaction,
+        ui_->button_add_category,
+        ui_->button_show_summary,
+    };
+
+    ui_->grand_total_label->setStyleSheet(
+        simba::style::sheets::labels::grand_total_unloaded);
+
+    for (QPushButton* const button : overview_buttons) {
+        button->setStyleSheet(simba::style::sheets::buttons::overview_disabled);
+        button->setDisabled(true);
     }
 }
 
@@ -89,6 +114,8 @@ void MainWindow::OnCreateBudget() {
         current_budget_path_ = to_create;
         open_budget_ = new simba::Budget;
         open_budget_->SaveToFile(current_budget_path_.toStdString());
+
+        this->EnableOverview();
     }
 }
 
