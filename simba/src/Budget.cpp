@@ -12,11 +12,19 @@ namespace simba {
 
 Budget::Budget() noexcept : cents_{0}, transaction_history_{} {}
 
+Budget::Budget(Budget&& other) noexcept
+    : cents_{other.cents_}, transaction_history_{other.transaction_history_} {}
+
 Budget::Budget(const nlohmann::json& json)
     : cents_{json.at("cents")},
       transaction_history_(
-          json.at("transaction_history")
-              .get<std::vector<Transaction>>()) {}
+          json.at("transaction_history").get<std::vector<Transaction>>()) {}
+
+Budget& Budget::operator=(Budget&& other) noexcept {
+    cents_ = other.cents_;
+    transaction_history_ = std::move(other.transaction_history_);
+    return *this;
+}
 
 void Budget::ToJson(nlohmann::json& json) const {
     json = {

@@ -44,23 +44,6 @@ void MainWindow::OnLicenseInfoTriggered() {
     license_info.exec();
 }
 
-void MainWindow::OnOpenBudget() {
-    constexpr const char* caption{"Open Simba Budget"};
-    constexpr const char* filter{"Simba Files (*.simba)"};
-
-    const QString to_open{
-        QFileDialog::getOpenFileName(this, tr(caption), {}, tr(filter))};
-    if (to_open.isEmpty()) {
-        (void)QMessageBox::warning(this, tr("Simba"),
-                                   tr("No file selected. Budget not loaded"));
-    } else {
-        // TODO(SEP): implement JSON parsing
-        (void)QMessageBox::information(this, tr("Simba"), tr("TODO"));
-        const std::string path{to_open.toStdString()};
-        this->EnableOverview();
-    }
-}
-
 void MainWindow::EnableOverview() {
     static const std::array<QPushButton*, 3> overview_buttons{
         ui_->button_add_transaction,
@@ -90,6 +73,28 @@ void MainWindow::DisableOverview() {
     for (QPushButton* const button : overview_buttons) {
         button->setStyleSheet(simba::style::sheets::buttons::overview_disabled);
         button->setDisabled(true);
+    }
+}
+
+void MainWindow::OnOpenBudget() {
+    constexpr const char* caption{"Open Simba Budget"};
+    constexpr const char* filter{"Simba Files (*.simba)"};
+
+    const QString to_open{
+        QFileDialog::getOpenFileName(this, tr(caption), {}, tr(filter))};
+    if (to_open.isEmpty()) {
+        (void)QMessageBox::warning(this, tr("Simba"),
+                                   tr("No file selected. Budget not loaded"));
+    } else {
+        // TODO(SEP): implement JSON parsing
+        if (open_budget_) {
+            open_budget_->SaveToFile(current_budget_path_.toStdString());
+            delete open_budget_;
+        }
+        const std::string path{to_open.toStdString()};
+        current_budget_path_ = to_open;
+        open_budget_ = new simba::Budget{simba::Budget::FromFile(path)};
+        this->EnableOverview();
     }
 }
 

@@ -19,6 +19,13 @@ class Budget final {
     void ToJson(nlohmann::json&) const;
     void SaveToFile(const std::string& path);
 
+ public:  // rule of five
+    Budget(Budget&&) noexcept;
+    Budget& operator=(Budget&&) noexcept;
+    Budget(const Budget&) = delete;
+    Budget& operator=(const Budget&) = delete;
+    ~Budget() noexcept = default;
+
  public:
     struct Transaction final {
         std::chrono::year_month_day date;
