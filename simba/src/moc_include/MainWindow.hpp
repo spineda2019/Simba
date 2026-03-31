@@ -2,14 +2,13 @@
 #define SIMBA_SRC_MOC_INCLUDE_MAINWINDOW
 
 #include <qmainwindow.h>
+#include <qobject.h>
 #include <qpushbutton.h>
-#include <qt6/QtCore/qobject.h>
 #include <qtconfigmacros.h>
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
 #include <Budget.hpp>
-#include <array>
 
 #include "Budget.hpp"
 
