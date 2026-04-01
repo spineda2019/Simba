@@ -2,11 +2,11 @@
 
 #include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <sstream>
 #include <string>
-
-#include "nlohmann/json_fwd.hpp"
 
 namespace simba {
 
@@ -64,12 +64,19 @@ Budget::Transaction::Transaction(const nlohmann::json& json)
 
     const std::string time_string{json.at("time")};
     std::istringstream time_stream{time_string};
-    std::chrono::seconds aux{};
 
-    std::chrono::from_stream(date_stream, "%F", date);
-    std::chrono::from_stream(time_stream, "%T", aux);
+    std::tm tm{};
 
-    time = std::chrono::hh_mm_ss<decltype(aux)>{aux};
+    date_stream >> std::get_time(&tm, "%Y-%m-%d");
+    date = std::chrono::year{tm.tm_year + 1900} /
+           std::chrono::month{static_cast<unsigned>(tm.tm_mon + 1)} /
+           std::chrono::day{static_cast<unsigned>(tm.tm_mday)};
+
+    time_stream >> std::get_time(&tm, "%H:%M:%S");
+    auto aux = std::chrono::hours{tm.tm_hour} +
+               std::chrono::minutes{tm.tm_min} +
+               std::chrono::seconds{tm.tm_sec};
+    time = std::chrono::hh_mm_ss<std::chrono::seconds>{aux};
 }
 
 void Budget::Transaction::ToJson(nlohmann::json& json) const {
