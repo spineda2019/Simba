@@ -24,6 +24,7 @@ class MainWindow final : public QMainWindow {
  public:
     explicit MainWindow(QWidget* parent = nullptr);
 
+ public:  // rule of five
     ~MainWindow();
     MainWindow(const MainWindow&) = delete;
     MainWindow(MainWindow&&) = delete;
@@ -39,6 +40,9 @@ class MainWindow final : public QMainWindow {
     void OnOpenBudget();
     void OnCreateBudget();
     void OnShowSourceCode();
+    void OnNewTransaction();
+    void OnNewCategory();
+    void OnShowSummary();
 
  private:
     QString current_budget_path_{};

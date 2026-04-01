@@ -33,11 +33,28 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::OnCreateBudget);
     connect(this->ui_->action_see_the_source_code, &QAction::triggered, this,
             &MainWindow::OnShowSourceCode);
+    connect(this->ui_->button_add_transaction, &QPushButton::clicked, this,
+            &MainWindow::OnNewTransaction);
+    connect(this->ui_->button_add_category, &QPushButton::clicked, this,
+            &MainWindow::OnNewCategory);
+    connect(this->ui_->button_show_summary, &QPushButton::clicked, this,
+            &MainWindow::OnShowSummary);
 
     this->DisableOverview();
 }
 
 MainWindow::~MainWindow() { delete ui_; }
+
+void MainWindow::OnNewTransaction() {
+    (void)QMessageBox::information(this, tr("Simba"), tr("TODO"));
+}
+
+void MainWindow::OnNewCategory() {
+    (void)QMessageBox::information(this, tr("Simba"), tr("TODO"));
+}
+void MainWindow::OnShowSummary() {
+    (void)QMessageBox::information(this, tr("Simba"), tr("TODO"));
+}
 
 void MainWindow::OnLicenseInfoTriggered() {
     LicenseInfo license_info{this};
@@ -86,7 +103,6 @@ void MainWindow::OnOpenBudget() {
         (void)QMessageBox::warning(this, tr("Simba"),
                                    tr("No file selected. Budget not loaded"));
     } else {
-        // TODO(SEP): implement JSON parsing
         if (open_budget_) {
             open_budget_->SaveToFile(current_budget_path_.toStdString());
             delete open_budget_;
