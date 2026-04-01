@@ -91,6 +91,8 @@ void MainWindow::DisableOverview() {
         button->setStyleSheet(simba::style::sheets::buttons::overview_disabled);
         button->setDisabled(true);
     }
+
+    ui_->action_save->setDisabled(true);
 }
 
 void MainWindow::OnOpenBudget() {
@@ -112,6 +114,8 @@ void MainWindow::OnOpenBudget() {
         open_budget_ = new simba::Budget{simba::Budget::FromFile(path)};
         this->EnableOverview();
     }
+
+    ui_->action_save->setDisabled(false);
 }
 
 void MainWindow::OnCreateBudget() {
