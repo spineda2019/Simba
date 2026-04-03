@@ -28,10 +28,9 @@ class Budget final {
 
  public:
     struct Transaction final {
-        std::chrono::year_month_day date;
         std::chrono::hh_mm_ss<std::chrono::seconds> time;
-
         meta::signed_native_word_t amount;
+        std::chrono::year_month_day date;
 
         void ToJson(nlohmann::json&) const;
         Transaction(const nlohmann::json&);

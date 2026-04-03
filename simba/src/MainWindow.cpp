@@ -114,8 +114,6 @@ void MainWindow::OnOpenBudget() {
         open_budget_ = new simba::Budget{simba::Budget::FromFile(path)};
         this->EnableOverview();
     }
-
-    ui_->action_save->setDisabled(false);
 }
 
 void MainWindow::OnCreateBudget() {

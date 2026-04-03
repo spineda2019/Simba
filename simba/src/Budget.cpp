@@ -55,10 +55,10 @@ void Budget::SaveToFile(const std::string& path) {
     }
 }
 
-Budget::Transaction::Transaction() noexcept : date{}, time{}, amount{} {}
+Budget::Transaction::Transaction() noexcept : time{}, amount{}, date{} {}
 
 Budget::Transaction::Transaction(const nlohmann::json& json)
-    : date{}, time{}, amount{json.at("amount")} {
+    : time{}, amount{json.at("amount")}, date{} {
     const std::string date_string{json.at("date")};
     std::istringstream date_stream{date_string};
 
