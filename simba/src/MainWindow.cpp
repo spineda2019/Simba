@@ -17,6 +17,7 @@
 
 #include "include/Budget.hpp"
 #include "include/style.hpp"
+#include "meta.hpp"
 #include "moc_include/LicenseInfo.hpp"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -93,6 +94,10 @@ void MainWindow::DisableOverview() {
     }
 
     ui_->action_save->setDisabled(true);
+}
+
+void MainWindow::UpdateTotal(simba::meta::signed_native_word_t total) {
+    (void)total;
 }
 
 void MainWindow::OnOpenBudget() {

@@ -23,7 +23,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Grand Total: 0</string>
+       <string>Grand Total: $0.00</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>

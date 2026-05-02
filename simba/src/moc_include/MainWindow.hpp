@@ -9,6 +9,7 @@
 #include <qwidget.h>
 
 #include <Budget.hpp>
+#include <meta.hpp>
 
 #include "Budget.hpp"
 
@@ -34,6 +35,7 @@ class MainWindow final : public QMainWindow {
  private:
     void EnableOverview();
     void DisableOverview();
+    void UpdateTotal(simba::meta::signed_native_word_t total);
 
  private slots:
     void OnLicenseInfoTriggered();
